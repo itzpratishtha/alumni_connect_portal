@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Group Chat | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/modern.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <!-- LEFT: LOGO + NAME -->
+     <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="nav-brand">
+      <img src="../assets/alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <!-- CENTER: LINKS -->
+    <div class="nav-links" id="navbarLinks">
+
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student,alumni">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <!-- RIGHT: USER PROFILE -->
+    <div class="nav-user" id="navUser"></div>
+    
+
+  </div>
+</header>
+
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HEADER -->
+    <section class="card" style="margin-top:30px;">
+      <h2 id="groupTitle">Group Chat</h2>
+      <p style="margin-top:6px; color:#6b7280;">
+        Chat with all group members in real time.
+      </p>
+    </section>
+
+    <!-- CHAT -->
+    <section class="card" style="margin-top:20px;">
+
+      <!-- Messages -->
+      <div id="chatBox" class="chat-box"></div>
+
+      <!-- Input -->
+      <form id="chatForm" style="margin-top:14px; display:flex; gap:10px;">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Type your message..."
+          required
+        />
+        <button class="btn" type="submit">Send</button>
+      </form>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 PIET Alumni Connect
+  </footer>
+
+  <!-- JS -->
+  <script src="../js/api.js"></script>
+  <script src="../js/protect.js"></script>
+  <script src="../js/roleNavbar.js"></script>
+  <script src="../js/logout.js"></script>
+  <script src="../js/navbarUser.js"></script>
+  <script src="../js/mobileNav.js"></script>
+
+
+
+  <!-- Socket.io -->
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+
+  <script>
+    const socket = io("http://localhost:5001");
+
+    const chatBox = document.getElementById("chatBox");
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("messageInput");
+
+    const params = new URLSearchParams(window.location.search);
+    const groupId = params.get("groupId");
+    const userId = localStorage.getItem("userId");
+
+    if (!groupId) {
+      chatBox.innerHTML = "<p>No group selected.</p>";
+      chatForm.style.display = "none";
+    }
+
+    // Join group room
+    socket.emit("joinGroupRoom", { groupId });
+
+    // Load previous group messages
+    async function loadGroupMessages() {
+      chatBox.innerHTML = "<p>Loading messages...</p>";
+
+      const res = await apiCall(`/api/groups/messages/${groupId}`, "GET", null, true);
+      chatBox.innerHTML = "";
+
+      if (!res || res.length === 0) {
+        chatBox.innerHTML = "<p>No messages yet.</p>";
+        return;
+      }
+
+      res.forEach(msg => {
+        appendMessage(msg.message, msg.sender_id == userId, msg.sender_name);
+      });
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Append message
+    function appendMessage(text, isMe, senderName = "") {
+      const div = document.createElement("div");
+      div.className = "chat-message" + (isMe ? " me" : "");
+      div.innerHTML = isMe
+        ? text
+        : `<strong>${senderName}:</strong> ${text}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Receive realtime group message
+    socket.on("newGroupMessage", (data) => {
+      if (data.groupId == groupId) {
+        appendMessage(
+          data.message,
+          data.senderId == userId,
+          data.senderName || "User"
+        );
+      }
+    });
+
+    // Send message
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      // Save to DB
+      await apiCall(
+        "/api/groups/messages/send",
+        "POST",
+        { groupId, message },
+        true
+      );
+
+      // Emit socket
+      socket.emit("sendGroupMessage", {
+        groupId,
+        senderId: Number(userId),
+        message
+      });
+
+      appendMessage(message, true);
+      messageInput.value = "";
+    });
+
+    loadGroupMessages();
+  </script>
+
+</body>
+</html>

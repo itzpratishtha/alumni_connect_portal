@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/modern.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <!-- LEFT: LOGO + NAME -->
+     <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="nav-brand">
+      <img src="../assets/alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <!-- CENTER: LINKS -->
+    <div class="nav-links" id="navbarLinks">
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student,alumni">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <!-- RIGHT: USER PROFILE -->
+    <div class="nav-user" id="navUser"></div>
+
+  </div>
+</header>
+
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HEADER -->
+    <section class="card" style="margin-top:30px;">
+      <h2>My Profile</h2>
+      <p style="margin-top:6px; color:#6b7280;">
+        View and update your personal and professional details.
+      </p>
+    </section>
+    <div class="profile-photo-box">
+  <img id="profilePhotoPreview" src="" alt="Profile Photo">
+</div>
+
+<h3 style="margin-top:20px;">Profile Photo</h3>
+<input type="file" id="photoInput" accept="image/*">
+<button class="btn" onclick="uploadPhoto()">Replace Photo</button>
+<button class="btn danger" onclick="deletePhoto()">Delete Photo</button>
+
+
+    <!-- PROFILE FORM -->
+    <section class="card" style="margin-top:20px;">
+      <form id="profileForm">
+
+        <h3>Basic Information</h3>
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" disabled>
+
+        <h3 style="margin-top:20px;">Academic / Professional</h3>
+        <input type="text" id="batch" placeholder="Batch (e.g. 2022)">
+        <input type="text" id="domain" placeholder="Domain (e.g. Web, AI, Core CS)">
+        <input type="text" id="company" placeholder="Company / College">
+        <input type="text" id="location" placeholder="Location">
+
+        <h3 style="margin-top:20px;">Social Links</h3>
+        <input type="url" id="linkedin" placeholder="LinkedIn Profile URL">
+        <input type="url" id="github" placeholder="GitHub Profile URL">
+
+        <button type="submit" class="btn" style="margin-top:20px;">
+          Save Changes
+        </button>
+        <button class="btn" onclick="requestUpgrade()">
+  Request Alumni Role
+</button>
+
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 PIET Alumni Connect
+  </footer>
+
+  <!-- JS -->
+  <script src="../js/api.js"></script>
+  <script src="../js/protect.js"></script>
+  <script src="../js/roleNavbar.js"></script>
+  <script src="../js/logout.js"></script>
+  <script src="../js/navbarUser.js"></script>
+  <script src="../js/mobileNav.js"></script>
+
+<script>
+  const form = document.getElementById("profileForm");
+  const backendURL = "http://localhost:5001";
+
+  // ✅ Load Profile
+  async function loadProfile() {
+    try {
+      const res = await apiCall("/api/profile/me", "GET");
+
+      // if backend returns { success:true, profile:{...} }
+      const profile = res.profile ? res.profile : res;
+
+      document.getElementById("name").value = profile.name || "";
+      document.getElementById("email").value = profile.email || "";
+      document.getElementById("batch").value = profile.batch || "";
+      document.getElementById("domain").value = profile.domain || "";
+      document.getElementById("company").value = profile.company || "";
+      document.getElementById("location").value = profile.location || "";
+      document.getElementById("linkedin").value = profile.linkedin || "";
+      document.getElementById("github").value = profile.github || "";
+
+    } catch (err) {
+      console.error("LOAD PROFILE ERROR:", err);
+      alert(err.message || "Failed to load profile");
+    }
+  }
+
+  // ✅ Update Profile
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+      name: document.getElementById("name").value.trim(),
+      batch: document.getElementById("batch").value.trim(),
+      domain: document.getElementById("domain").value.trim(),
+      company: document.getElementById("company").value.trim(),
+      location: document.getElementById("location").value.trim(),
+      linkedin: document.getElementById("linkedin").value.trim(),
+      github: document.getElementById("github").value.trim()
+    };
+
+    try {
+      const res = await apiCall("/api/profile/update", "POST", data);
+      alert(res.message || "Profile updated successfully!");
+    } catch (err) {
+      console.error("UPDATE PROFILE ERROR:", err);
+      alert(err.message || "Failed to update profile");
+    }
+  });
+
+  // ✅ Upload Photo
+  async function uploadPhoto() {
+    const input = document.getElementById("photoInput");
+
+    if (!input.files.length) {
+      alert("Please select a photo");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("photo", input.files[0]);
+
+    try {
+      const res = await fetch(`${backendURL}/api/profile/upload-photo`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Upload failed");
+        return;
+      }
+
+      // ✅ SAVE PHOTO PATH
+      localStorage.setItem("profilePhoto", data.photo);
+
+      alert("Photo uploaded successfully");
+      window.location.reload();
+    } catch (err) {
+      console.error("UPLOAD ERROR:", err);
+      alert("Upload error");
+    }
+  }
+
+  // ✅ Show Photo Preview
+  const photo = localStorage.getItem("profilePhoto");
+  const preview = document.getElementById("profilePhotoPreview");
+
+  if (preview) {
+    if (photo) {
+      preview.src = backendURL + photo;
+    } else {
+      preview.src = "../assets/default-avatar.png";
+    }
+  }
+
+  // ✅ Delete Photo
+  async function deletePhoto() {
+    try {
+      const res = await fetch(`${backendURL}/api/profile/delete-photo`, {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Delete failed");
+        return;
+      }
+
+      localStorage.removeItem("profilePhoto");
+      alert("Photo deleted");
+      location.reload();
+    } catch (err) {
+      console.error("DELETE PHOTO ERROR:", err);
+      alert("Delete error");
+    }
+  }
+
+  // ✅ Role Upgrade Request
+  async function requestUpgrade() {
+    try {
+      const res = await apiCall("/api/profile/request-role-upgrade", "POST");
+      alert(res.message || "Request sent");
+    } catch (err) {
+      console.error("ROLE UPGRADE ERROR:", err);
+      alert(err.message || "Failed to request upgrade");
+    }
+  }
+
+  // Load profile on page open
+  loadProfile();
+</script>
+
+</body>
+</html>
