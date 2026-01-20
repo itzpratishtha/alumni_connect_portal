@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = "https://studentalumniconnectportal-production.up.railway.app";
+
 
 async function apiCall(endpoint, method = "GET", body = null, isFormData = false) {
   const token = localStorage.getItem("token");
