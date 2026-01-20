@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/modern.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <!-- LEFT: LOGO + NAME -->
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="nav-brand">
+      <img src="../assets/alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <!-- CENTER: LINKS -->
+    <div class="nav-links" id="navbarLinks">
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student,alumni">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <!-- RIGHT: USER PROFILE -->
+    <div class="nav-user" id="navUser"></div>
+
+  </div>
+</header>
+
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- Welcome -->
+    <section class="card" style="margin-top:30px;">
+      <h2>Welcome, <span id="userName">User</span> 👋</h2>
+      <p style="margin-top:8px; color:#6b7280;">
+        Connect with alumni, explore opportunities, and grow together.
+      </p>
+    </section>
+
+    <!-- DASHBOARD CARDS -->
+    <section class="cards-section">
+
+      <!-- Find Alumni -->
+      <div class="card" data-role="student">
+        <h3>Find Alumni</h3>
+        <p>Search alumni by batch, domain, company, and location.</p>
+        <a href="alumni.html" class="btn">Explore</a>
+      </div>
+
+      <!-- Jobs -->
+      <div class="card" data-role="student,alumni">
+        <h3>Jobs & Internships</h3>
+        <p>Explore job openings shared by alumni.</p>
+        <a href="jobs.html" class="btn">View Jobs</a>
+      </div>
+
+      <!-- Post Jobs (Alumni only) -->
+      <div class="card" data-role="alumni">
+        <h3>Post a Job</h3>
+        <p>Share job opportunities with students.</p>
+        <a href="jobs.html" class="btn">Post Now</a>
+      </div>
+
+      <!-- Groups -->
+      <div class="card" data-role="student,alumni">
+        <h3>Groups</h3>
+        <p>Join or create discussion groups.</p>
+        <a href="groups.html" class="btn">Open Groups</a>
+      </div>
+
+      <!-- Resources -->
+      <div class="card" data-role="student,alumni">
+        <h3>Resources Hub</h3>
+        <p>Access placement prep and learning resources.</p>
+        <a href="resources.html" class="btn">View Resources</a>
+      </div>
+
+      <!-- Messages -->
+      <div class="card" data-role="student,alumni">
+        <h3>Messages</h3>
+        <p>Chat privately with alumni and peers.</p>
+        <a href="messages.html" class="btn">Open Chat</a>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 PIET Alumni Connect
+  </footer>
+
+  <!-- JS -->
+  <script src="../js/protect.js"></script>
+  <script src="../js/roleNavbar.js"></script>
+  <script src="../js/logout.js"></script>
+  <script src="../js/navbarUser.js"></script>
+  <script src="../js/mobileNav.js"></script>
+
+
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const name = localStorage.getItem("name");
+    document.getElementById("userName").innerText = name ? name : "User";
+  });
+</script>
+

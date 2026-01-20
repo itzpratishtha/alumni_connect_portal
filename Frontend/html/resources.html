@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resources | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/modern.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <!-- LEFT: LOGO + NAME -->
+     <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="nav-brand">
+      <img src="../assets/alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <!-- CENTER: LINKS -->
+    <div class="nav-links" id="navbarLinks">
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student,alumni">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <!-- RIGHT: USER PROFILE -->
+    <div class="nav-user" id="navUser"></div>
+
+  </div>
+</header>
+
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HEADER -->
+    <section class="card" style="margin-top:30px;">
+      <h2>Placement & Learning Resources</h2>
+      <p style="margin-top:6px; color:#6b7280;">
+        Curated resources to help you prepare, learn, and succeed.
+      </p>
+    </section>
+
+    <!-- RESOURCES -->
+    <section class="cards-section">
+
+      <!-- DSA -->
+      <div class="card">
+        <h3>📘 Data Structures & Algorithms</h3>
+        <p>
+          Practice DSA for placements and interviews.
+        </p>
+        <ul style="margin-top:10px;">
+          <li><a href="https://takeuforward.org/" target="_blank">Take U Forward</a></li>
+          <li><a href="https://leetcode.com/" target="_blank">LeetCode</a></li>
+          <li><a href="https://www.geeksforgeeks.org/" target="_blank">GeeksforGeeks</a></li>
+        </ul>
+      </div>
+
+      <!-- Web Dev -->
+      <div class="card">
+        <h3>🌐 Web Development</h3>
+        <p>
+          Learn frontend & backend development.
+        </p>
+        <ul style="margin-top:10px;">
+          <li><a href="https://developer.mozilla.org/" target="_blank">MDN Web Docs</a></li>
+          <li><a href="https://www.freecodecamp.org/" target="_blank">freeCodeCamp</a></li>
+          <li><a href="https://roadmap.sh/" target="_blank">Roadmap.sh</a></li>
+        </ul>
+      </div>
+
+      <!-- Core CS -->
+      <div class="card">
+        <h3>🧠 Core CS Subjects</h3>
+        <p>
+          Strengthen OS, DBMS, CN, and OOPS.
+        </p>
+        <ul style="margin-top:10px;">
+          <li><a href="https://www.gatevidyalay.com/" target="_blank">Gate Vidyalay</a></li>
+          <li><a href="https://www.nesoacademy.org/" target="_blank">Neso Academy</a></li>
+        </ul>
+      </div>
+
+      <!-- Resume -->
+      <div class="card">
+        <h3>📄 Resume & Interview</h3>
+        <p>
+          Prepare resumes and crack interviews.
+        </p>
+        <ul style="margin-top:10px;">
+          <li><a href="https://www.overleaf.com/gallery/tagged/cv" target="_blank">Resume Templates</a></li>
+          <li><a href="https://interviewing.io/" target="_blank">Mock Interviews</a></li>
+        </ul>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 PIET Alumni Connect
+  </footer>
+
+  <!-- JS -->
+  <script src="../js/protect.js"></script>
+  <script src="../js/roleNavbar.js"></script>
+  <script src="../js/logout.js"></script>
+  <script src="../js/navbarUser.js"></script>
+  <script src="../js/mobileNav.js"></script>
+
+
+
+</body>
+</html>
