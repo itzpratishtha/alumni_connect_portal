@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/modern.css" />
+</head>
+
+<body class="auth-page">
+
+  <div class="auth-card">
+    <h2>Create Account ✨</h2>
+    <p style="text-align:center; margin-bottom:20px; color:#6b7280;">
+      Join PIET Alumni Connect
+    </p>
+
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email address" required />
+      <input type="password" id="password" placeholder="Password" required />
+
+      <select id="role" required>
+        <option value="">Select Role</option>
+        <option value="student">Student</option>
+        <option value="alumni">Alumni</option>
+      </select>
+
+      <button type="submit" class="btn" id="registerBtn">Register</button>
+    </form>
+
+    <p style="text-align:center; margin-top:15px;">
+      Already have an account?
+      <a href="login.html" style="color:#4f46e5; font-weight:500;">Login</a>
+    </p>
+  </div>
+
+  <!-- JS -->
+  <script src="../js/api.js"></script>
+
+  <script>
+    const form = document.getElementById("registerForm");
+    const registerBtn = document.getElementById("registerBtn");
+
+    // Prevent logged-in users from opening register page
+    if (localStorage.getItem("token")) {
+      window.location.href = "index.html";
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      if (!role) {
+        alert("Please select a role");
+        return;
+      }
+
+      // Disable button while request is processing
+      registerBtn.disabled = true;
+      registerBtn.innerText = "Registering...";
+
+      try {
+        const res = await apiCall("/api/auth/register", "POST", {
+          name,
+          email,
+          password,
+          role
+        });
+
+        // If backend returns college email restriction error
+        if (res.message && res.message.toLowerCase().includes("official college email")) {
+          alert(res.message);
+          registerBtn.disabled = false;
+          registerBtn.innerText = "Register";
+          return;
+        }
+
+        // ✅ Save email for OTP verification page
+        localStorage.setItem("pending_email", email);
+
+        alert("Registration successful! OTP sent to your email. Please verify OTP.");
+
+        // ✅ Redirect to OTP verification page
+        window.location.href = "verify-otp.html";
+
+      } catch (err) {
+        alert(err.message || "Registration failed");
+      } finally {
+        registerBtn.disabled = false;
+        registerBtn.innerText = "Register";
+      }
+    });
+  </script>
+
+</body>
+</html>

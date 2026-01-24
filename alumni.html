@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find Alumni | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/modern.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <!-- LEFT: LOGO + NAME -->
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="nav-brand">
+      <img src="../assets/alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <!-- CENTER: LINKS -->
+    <div class="nav-links" id="navbarLinks">
+   
+
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student,alumni">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <!-- RIGHT: USER PROFILE -->
+    <div class="nav-user" id="navUser"></div>
+   
+  </div>
+</header>
+
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- PAGE HEADER -->
+    <section class="card" style="margin-top:30px;">
+      <h2>Find Alumni</h2>
+      <p style="margin-top:6px; color:#6b7280;">
+        Search alumni by batch, domain, company, or location.
+      </p>
+    </section>
+
+    <!-- FILTERS -->
+    <section class="card" style="margin-top:20px;">
+      <form id="filterForm" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
+        <input type="text" id="batch" placeholder="Batch (e.g. 2022)">
+        <input type="text" id="domain" placeholder="Domain (e.g. Web, AI)">
+        <input type="text" id="company" placeholder="Company">
+        <input type="text" id="location" placeholder="Location">
+
+        <button type="submit" class="btn" style="grid-column:1/-1;">
+          Search Alumni
+        </button>
+      </form>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="cards-section" id="alumniResults"></section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 PIET Alumni Connect
+  </footer>
+
+  <!-- JS -->
+  <script src="/js/api.js"></script>
+  <script src="/js/protect.js"></script>
+  <script src="/js/roleNavbar.js"></script>
+  <script src="/js/logout.js"></script>
+  <script src="/js/navbarUser.js"></script>
+  <script src="/js/mobileNav.js"></script>
+
+
+
+  <script>
+    const resultsDiv = document.getElementById("alumniResults");
+    const form = document.getElementById("filterForm");
+
+    async function loadAlumni(filters = {}) {
+      resultsDiv.innerHTML = "<p>Loading alumni...</p>";
+
+      const query = new URLSearchParams(filters).toString();
+      const res = await apiCall(`/api/alumni?${query}`, "GET", null, true);
+
+      resultsDiv.innerHTML = "";
+
+      if (!res || res.length === 0) {
+        resultsDiv.innerHTML = "<p>No alumni found.</p>";
+        return;
+      }
+
+      res.forEach(a => {
+        resultsDiv.innerHTML += `
+          <div class="card">
+            <h3>${a.name}</h3>
+            <p style="color:#6b7280;">
+              ${a.batch || "-"} • ${a.domain || "-"}
+            </p>
+            <p>
+              <strong>${a.company || "—"}</strong><br>
+              ${a.location || ""}
+            </p>
+
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <a href="profile.html?id=${a.id}" class="btn">View Profile</a>
+              <a href="messages.html?to=${a.id}" class="btn">Message</a>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const filters = {
+        batch: document.getElementById("batch").value,
+        domain: document.getElementById("domain").value,
+        company: document.getElementById("company").value,
+        location: document.getElementById("location").value
+      };
+
+      loadAlumni(filters);
+    });
+
+    // Initial load
+    loadAlumni();
+  </script>
+
+</body>
+</html>

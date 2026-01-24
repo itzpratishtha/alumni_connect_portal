@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Group Members | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/modern.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <!-- LEFT: LOGO + NAME -->
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="nav-brand">
+      <img src="../assets/alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <!-- CENTER: LINKS -->
+    <div class="nav-links" id="navbarLinks">
+
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student,alumni">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <!-- RIGHT: USER PROFILE -->
+    <div class="nav-user" id="navUser"></div>
+
+  </div>
+</header>
+
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HEADER -->
+    <section class="card" style="margin-top:30px;">
+      <h2>Group Members</h2>
+      <p style="margin-top:6px; color:#6b7280;">
+        Members participating in this group.
+      </p>
+    </section>
+
+    <!-- MEMBERS LIST -->
+    <section class="cards-section" id="memberList"></section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 PIET Alumni Connect
+  </footer>
+
+  <!-- JS -->
+  <script src="/js/api.js"></script>
+  <script src="/js/protect.js"></script>
+  <script src="/js/roleNavbar.js"></script>
+  <script src="/js/logout.js"></script>
+  <script src="/js/navbarUser.js"></script>
+  <script src="/js/mobileNav.js"></script>
+
+
+
+  <script>
+    const memberList = document.getElementById("memberList");
+    const params = new URLSearchParams(window.location.search);
+    const groupId = params.get("groupId");
+
+    if (!groupId) {
+      alert("Group not selected");
+      window.location.href = "groups.html";
+    }
+
+    async function loadMembers() {
+      memberList.innerHTML = "<p>Loading members...</p>";
+
+      const res = await apiCall(`/api/groups/members/${groupId}`, "GET", null, true);
+      memberList.innerHTML = "";
+
+      if (!res || res.length === 0) {
+        memberList.innerHTML = "<p>No members found.</p>";
+        return;
+      }
+
+      res.forEach(m => {
+        memberList.innerHTML += `
+          <div class="card">
+            <h3>${m.name}</h3>
+            <p style="color:#6b7280;">
+              ${m.role === "alumni" ? "Alumni" : "Student"}
+            </p>
+            <p>
+              ${m.domain || ""}<br>
+              ${m.company || ""}
+            </p>
+
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <a href="profile.html?id=${m.id}" class="btn">View Profile</a>
+              <a href="messages.html?to=${m.id}" class="btn">Message</a>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    loadMembers();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Verify OTP | PIET Alumni Connect</title>
+  <link rel="stylesheet" href="/css/modern.css"/>
+</head>
+
+<body class="auth-page">
+
+  <div class="auth-card">
+    <h2>Verify Your Email ✅</h2>
+    <p class="muted">Enter the OTP sent to your email</p>
+
+    <!-- EMAIL (readonly / autofill) -->
+    <div class="form-group">
+      <input id="email" type="email" placeholder="Email" required readonly />
+    </div>
+
+    <!-- OTP INPUT -->
+    <div class="form-group" style="margin-top:14px;">
+      <input id="otp" type="text" maxlength="6" placeholder="Enter 6-digit OTP" required />
+      <button class="btn" id="verifyOtpBtn">Verify OTP</button>
+    </div>
+
+    <!-- RESEND OTP -->
+    <p class="small-text" style="margin-top:14px; text-align:center;">
+      Didn’t receive OTP?
+      <button id="resendOtpBtn" style="background:none;border:none;color:#4f46e5;font-weight:600;cursor:pointer;">
+        Resend OTP
+      </button>
+    </p>
+
+    <p class="small-text" style="margin-top:10px; text-align:center;">
+      Already verified?
+      <a href="login.html">Login</a>
+    </p>
+  </div>
+
+  <script src="../js/api.js"></script>
+
+  <script>
+    const emailInput = document.getElementById("email");
+    const otpInput = document.getElementById("otp");
+    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+    const resendOtpBtn = document.getElementById("resendOtpBtn");
+
+    // ✅ Autofill email from register page
+    const pendingEmail = localStorage.getItem("pending_email");
+
+    if (!pendingEmail) {
+      alert("No email found for verification. Please register again.");
+      window.location.href = "register.html";
+    } else {
+      emailInput.value = pendingEmail;
+    }
+
+    // ✅ Verify OTP (registration verification only)
+    verifyOtpBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const otp = otpInput.value.trim();
+
+      if (!otp || otp.length !== 6) {
+        alert("Please enter a valid 6-digit OTP");
+        return;
+      }
+
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.innerText = "Verifying...";
+
+      try {
+        const res = await apiCall("/api/auth/verify-otp", "POST", { email, otp });
+
+        alert(res.message || "OTP verified successfully!");
+
+        // ✅ Clear pending email after verification
+        localStorage.removeItem("pending_email");
+
+        // ✅ Redirect to login page (password login)
+        window.location.href = "login.html";
+
+      } catch (err) {
+        console.error("VERIFY OTP ERROR:", err);
+        alert(err.message || "OTP verification failed");
+      } finally {
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.innerText = "Verify OTP";
+      }
+    });
+
+    // ✅ Resend OTP (only for registration if user didn't receive OTP)
+    resendOtpBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+
+      resendOtpBtn.disabled = true;
+      resendOtpBtn.innerText = "Sending...";
+
+      try {
+        const res = await apiCall("/api/auth/resend-otp", "POST", { email });
+        alert(res.message || "OTP resent successfully!");
+      } catch (err) {
+        console.error("RESEND OTP ERROR:", err);
+        alert(err.message || "Failed to resend OTP");
+      } finally {
+        resendOtpBtn.disabled = false;
+        resendOtpBtn.innerText = "Resend OTP";
+      }
+    });
+  </script>
+
+</body>
+</html>
