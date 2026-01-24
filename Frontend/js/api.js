@@ -1,4 +1,4 @@
-const BASE_URL = "https://studentalumniconnectportal-production.up.railway.app";
+const BASE_URL = "https://studentalumniconnectportal-production-be61.up.railway.app/";
 
 
 async function apiCall(endpoint, method = "GET", body = null, isFormData = false) {
