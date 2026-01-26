@@ -1,19 +1,31 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-export const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-transporter.verify((err) => {
-  if (err) {
-    console.log("MAILER VERIFY ERROR:", err.message);
-  } else {
-    console.log("MAILER READY ✅");
+export async function sendOTPEmail(email, otp) {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.log("❌ RESEND_API_KEY missing in environment variables");
+      return false;
+    }
+
+    await resend.emails.send({
+      from: "Alumni Connect <onboarding@resend.dev>",
+      to: email,
+      subject: "Your OTP Code",
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Your OTP is: ${otp}</h2>
+          <p>This OTP is valid for <b>10 minutes</b>.</p>
+          <p>If you did not request this, ignore this email.</p>
+        </div>
+      `,
+    });
+
+    console.log("✅ OTP email sent to:", email);
+    return true;
+  } catch (error) {
+    console.log("❌ RESEND OTP EMAIL ERROR:", error?.message || error);
+    return false;
   }
-});
+}
