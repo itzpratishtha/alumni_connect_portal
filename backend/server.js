@@ -1,8 +1,20 @@
+import cors from "cors";
+
+app.use(cors({
+  origin: [
+    "https://itzpratishtha.github.io",   // GitHub Pages frontend
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
+}));
+
+// 👇 VERY IMPORTANT: allow preflight
+app.options("*", cors());
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
 
 import express from "express";
-import cors from "cors";
 import http from "http";          // NEW
 import { Server } from "socket.io"; // NEW
 
@@ -19,10 +31,6 @@ import { fileURLToPath } from "url";
 
 
 const app = express();
-app.use(cors({
-  origin: ["https://xxxx.netlify.app"],
-  credentials: true
-}));
 
 app.use(express.json());
 
