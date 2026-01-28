@@ -12,9 +12,6 @@ import {
 
 import { sendOTPEmail } from "../config/mailer.js";
 
-// after generating otp:
-await sendOTPEmail(email, otp);
-
 // ==============================
 // ✅ Email domain restriction
 // ==============================
