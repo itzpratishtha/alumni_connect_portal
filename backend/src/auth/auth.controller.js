@@ -74,7 +74,11 @@ async function sendOtpEmail(email, otp) {
 // =====================================================
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    let { name, email, password, role } = req.body;
+
+    // normalize inputs
+    name = name?.trim();
+    email = email?.trim().toLowerCase();
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -83,15 +87,21 @@ export const register = async (req, res) => {
       });
     }
 
-    if (!isAllowedCollegeEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Please use your official college email only (@poornima.org or @piet.poornima.edu.in)",
+    const existingUser = await findUserByEmail(email);
+
+    // if user already exists but not verified → resend OTP
+    if (existingUser && existingUser.is_verified === 0) {
+      const otp = generateOTP();
+      const expires = new Date(Date.now() + 10 * 60 * 1000);
+
+      await saveOTP(existingUser.id, otp, expires);
+      await sendOTPEmail(email, otp); // ✅ email now exists
+
+      return res.status(200).json({
+        success: true,
+        message: "OTP resent to your email",
       });
     }
-
-    const existingUser = await findUserByEmail(email);
 
     if (existingUser) {
       return res.status(409).json({
@@ -100,23 +110,21 @@ export const register = async (req, res) => {
       });
     }
 
+    // new user
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const userId = await createUser(name, email, hashedPassword, role);
 
-    // Generate OTP + expiry (10 mins)
     const otp = generateOTP();
     const expires = new Date(Date.now() + 10 * 60 * 1000);
 
     await saveOTP(userId, otp, expires);
-
-    // Send OTP email
-    await sendOtpEmail(email, otp);
+    await sendOTPEmail(email, otp); // ✅ SAFE
 
     return res.status(201).json({
       success: true,
-      message: "Registration successful. OTP sent to your email.",
+      message: "Registered successfully. OTP sent to your email.",
     });
+
   } catch (err) {
     console.error("REGISTER ERROR:", err);
     return res.status(500).json({
