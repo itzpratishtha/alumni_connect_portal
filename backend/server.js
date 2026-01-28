@@ -40,7 +40,7 @@ app.use(cors({
 }));
 
 // 🔥 THIS LINE IS CRITICAL
-app.options("*", cors());
+app.options("/.*/", cors());
 
 app.use(express.json());
 
