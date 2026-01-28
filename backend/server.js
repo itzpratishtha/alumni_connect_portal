@@ -86,7 +86,7 @@ app.get("/", (req, res) => {
   res.send("Backend is running with Socket.io!");
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 8080;
 
 console.log("EMAIL ENV CHECK:", process.env.EMAIL_USER, process.env.EMAIL_PASS ? "PASS_OK" : "PASS_MISSING");
 
