@@ -1,16 +1,4 @@
 import cors from "cors";
-
-app.use(cors({
-  origin: [
-    "https://itzpratishtha.github.io",   // GitHub Pages frontend
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false
-}));
-
-// 👇 VERY IMPORTANT: allow preflight
-app.options("*", cors());
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
 
@@ -31,6 +19,28 @@ import { fileURLToPath } from "url";
 
 
 const app = express();
+
+const allowedOrigins = [
+  "https://itzpratishtha.github.io",
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like curl, postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(null,false);
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// 🔥 THIS LINE IS CRITICAL
+app.options("*", cors());
 
 app.use(express.json());
 
