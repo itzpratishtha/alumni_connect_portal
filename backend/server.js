@@ -39,9 +39,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// 🔥 THIS LINE IS CRITICAL
-app.options("/.*/", cors());
-
 app.use(express.json());
 
 const __filename = fileURLToPath(import.meta.url);
