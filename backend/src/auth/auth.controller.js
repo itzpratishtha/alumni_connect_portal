@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 
 import {
   createUser,
@@ -28,41 +27,6 @@ function isAllowedCollegeEmail(email) {
 // ==============================
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6 digits
-}
-
-// ==============================
-// ✅ Nodemailer Transport
-// ==============================
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-// ==============================
-// ✅ Send OTP Mail
-// ==============================
-async function sendOtpEmail(email, otp) {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "PIET Alumni Connect - OTP Verification",
-    html: `
-      <div style="font-family: Arial, sans-serif;">
-        <h2>PIET Alumni Connect Portal</h2>
-        <p>Your OTP for email verification is:</p>
-        <h1 style="letter-spacing: 3px;">${otp}</h1>
-        <p>This OTP is valid for 10 minutes.</p>
-        <p>If you didn't request this, ignore this email.</p>
-      </div>
-    `,
-  };
-
-  return transporter.sendMail(mailOptions);
 }
 
 // =====================================================
@@ -239,7 +203,7 @@ export const resendOtp = async (req, res) => {
 
     await saveOTP(user.id, otp, expires);
 
-    await sendOtpEmail(email, otp);
+    await sendOTPEmail(email, otp);
 
     return res.status(200).json({
       success: true,
