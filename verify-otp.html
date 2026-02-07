@@ -38,76 +38,86 @@
     </p>
   </div>
 
-  <script src="../js/api.js"></script>
-
   <script>
-    const emailInput = document.getElementById("email");
-    const otpInput = document.getElementById("otp");
-    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
-    const resendOtpBtn = document.getElementById("resendOtpBtn");
+  const API_BASE =
+    "https://studentalumniconnectportal-production-be61.up.railway.app";
 
-    // ✅ Autofill email from register page
-    const pendingEmail = localStorage.getItem("pending_email");
+  const emailInput = document.getElementById("email");
+  const otpInput = document.getElementById("otp");
+  const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+  const resendOtpBtn = document.getElementById("resendOtpBtn");
 
-    if (!pendingEmail) {
-      alert("No email found for verification. Please register again.");
-      window.location.href = "register.html";
-    } else {
-      emailInput.value = pendingEmail;
+  const pendingEmail = localStorage.getItem("pending_email");
+
+  if (!pendingEmail) {
+    alert("No email found for verification. Please register again.");
+    window.location.href = "register.html";
+  } else {
+    emailInput.value = pendingEmail;
+  }
+
+  // ✅ Verify OTP
+  verifyOtpBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const otp = otpInput.value.trim();
+
+    if (!otp || otp.length !== 6) {
+      alert("Please enter a valid 6-digit OTP");
+      return;
     }
 
-    // ✅ Verify OTP (registration verification only)
-    verifyOtpBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const otp = otpInput.value.trim();
+    verifyOtpBtn.disabled = true;
+    verifyOtpBtn.innerText = "Verifying...";
 
-      if (!otp || otp.length !== 6) {
-        alert("Please enter a valid 6-digit OTP");
-        return;
-      }
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
 
-      verifyOtpBtn.disabled = true;
-      verifyOtpBtn.innerText = "Verifying...";
+      const data = await res.json();
+      alert(data.message);
 
-      try {
-        const res = await apiCall("/api/auth/verify-otp", "POST", { email, otp });
-
-        alert(res.message || "OTP verified successfully!");
-
-        // ✅ Clear pending email after verification
+      if (data.success) {
         localStorage.removeItem("pending_email");
-
-        // ✅ Redirect to login page (password login)
         window.location.href = "login.html";
-
-      } catch (err) {
-        console.error("VERIFY OTP ERROR:", err);
-        alert(err.message || "OTP verification failed");
-      } finally {
-        verifyOtpBtn.disabled = false;
-        verifyOtpBtn.innerText = "Verify OTP";
       }
-    });
+    } catch (err) {
+      console.error(err);
+      alert("OTP verification failed");
+    } finally {
+      verifyOtpBtn.disabled = false;
+      verifyOtpBtn.innerText = "Verify OTP";
+    }
+  });
 
-    // ✅ Resend OTP (only for registration if user didn't receive OTP)
-    resendOtpBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
+  // ✅ Resend OTP
+  resendOtpBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
 
-      resendOtpBtn.disabled = true;
-      resendOtpBtn.innerText = "Sending...";
+    resendOtpBtn.disabled = true;
+    resendOtpBtn.innerText = "Sending...";
 
-      try {
-        const res = await apiCall("/api/auth/resend-otp", "POST", { email });
-        alert(res.message || "OTP resent successfully!");
-      } catch (err) {
-        console.error("RESEND OTP ERROR:", err);
-        alert(err.message || "Failed to resend OTP");
-      } finally {
-        resendOtpBtn.disabled = false;
-        resendOtpBtn.innerText = "Resend OTP";
-      }
-    });
-  </script>
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+      alert(data.message);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to resend OTP");
+    } finally {
+      resendOtpBtn.disabled = false;
+      resendOtpBtn.innerText = "Resend OTP";
+    }
+  });
+</script>
+
 
 </body>
 </html>
