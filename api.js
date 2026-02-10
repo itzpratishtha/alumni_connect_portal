@@ -1,4 +1,4 @@
-const BASE_URL = "https://alumni-connect-portal-jba5.onrender.com";
+const BASE_URL = "studentalumniconnectportal-production-be61.up.railway.app";
 
 
 async function apiCall(endpoint, method = "GET", body = null, isFormData = false) {
