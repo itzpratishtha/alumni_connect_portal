@@ -4,40 +4,17 @@ import jwt from "jsonwebtoken";
 import {
   createUser,
   findUserByEmail,
-  saveOTP,
-  verifyUserOTP,
   markUserVerified,
 } from "../models/UserModel.js";
 
-import { sendOTPEmail } from "../config/mailer.js";
-
 // ==============================
-// ✅ Email domain restriction
-// ==============================
-const allowedDomains = ["poornima.org", "piet.poornima.edu.in"];
-
-function isAllowedCollegeEmail(email) {
-  if (!email || !email.includes("@")) return false;
-  const domain = email.split("@")[1].toLowerCase();
-  return allowedDomains.includes(domain);
-}
-
-// ==============================
-// ✅ OTP Generator
-// ==============================
-export const generateOTP = () =>
-  Math.floor(100000 + Math.random() * 900000).toString();
-
-
-// =====================================================
-// ✅ REGISTER (OTP sent, user not verified initially)
+// ✅ REGISTER (AUTO-VERIFIED)
 // Endpoint: POST /api/auth/register
-// =====================================================
+// ==============================
 export const register = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
 
-    // normalize inputs
     name = name?.trim();
     email = email?.trim().toLowerCase();
 
@@ -49,21 +26,6 @@ export const register = async (req, res) => {
     }
 
     const existingUser = await findUserByEmail(email);
-
-    // if user already exists but not verified → resend OTP
-    if (existingUser && existingUser.is_verified === 0) {
-      const otp = generateOTP();
-      const expires = new Date(Date.now() + 10 * 60 * 1000);
-
-      await saveOTP(existingUser.id, otp, expires);
-      await sendOTPEmail(email, otp); // ✅ email now exists
-
-      return res.status(200).json({
-        success: true,
-        message: "OTP resent to your email",
-      });
-    }
-
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -71,19 +33,15 @@ export const register = async (req, res) => {
       });
     }
 
-    // new user
     const hashedPassword = await bcrypt.hash(password, 10);
     const userId = await createUser(name, email, hashedPassword, role);
 
-    const otp = generateOTP();
-    const expires = new Date(Date.now() + 10 * 60 * 1000);
-
-    await saveOTP(userId, otp, expires);
-    await sendOTPEmail(email, otp); // ✅ SAFE
+    // ✅ AUTO VERIFY USER (NO OTP / NO EMAIL)
+    await markUserVerified(userId);
 
     return res.status(201).json({
       success: true,
-      message: "Registered successfully. OTP sent to your email.",
+      message: "Registered successfully. You can login now.",
     });
 
   } catch (err) {
@@ -95,103 +53,10 @@ export const register = async (req, res) => {
   }
 };
 
-// =====================================================
-// ✅ VERIFY OTP (Only for registration)
-// Endpoint: POST /api/auth/verify-otp
-// =====================================================
-export const verifyOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    const user = await findUserByEmail(email);
-    if (!user)
-      return res.status(404).json({ success: false, message: "User not found" });
-
-    if (user.is_verified)
-      return res.json({ success: true, message: "Email already verified" });
-
-    if (!user.otp || !user.otp_expires)
-      return res
-        .status(400)
-        .json({ success: false, message: "OTP not generated" });
-
-    if (Date.now() > user.otp_expires)
-      return res
-        .status(400)
-        .json({ success: false, message: "OTP expired" });
-
-    const verifiedUser = await verifyUserOTP(email, otp);
-    if (!verifiedUser)
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid OTP" });
-
-    await markUserVerified(user.id);
-
-    res.json({ success: true, message: "Email verified successfully" });
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ success: false, message: "OTP verification failed" });
-  }
-};
-
-// =====================================================
-// ✅ RESEND OTP (Only if not verified)
-// Endpoint: POST /api/auth/resend-otp
-// =====================================================
-export const resendOtp = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Email is required",
-      });
-    }
-
-    const user = await findUserByEmail(email);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    if (user.is_verified === 1) {
-      return res.status(400).json({
-        success: false,
-        message: "User already verified. Please login.",
-      });
-    }
-
-    const otp = generateOTP();
-    const expires = new Date(Date.now() + 10 * 60 * 1000);
-
-    await saveOTP(user.id, otp, expires);
-
-    await sendOTPEmail(email, otp);
-
-    return res.status(200).json({
-      success: true,
-      message: "OTP resent successfully. Check your email.",
-    });
-  } catch (err) {
-    console.error("RESEND OTP ERROR:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-};
-
-// =====================================================
-// ✅ LOGIN (Only email + password)
+// ==============================
+// ✅ LOGIN
 // Endpoint: POST /api/auth/login
-// =====================================================
+// ==============================
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -203,8 +68,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const user = await findUserByEmail(email);
-
+    const user = await findUserByEmail(email.toLowerCase());
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -212,15 +76,7 @@ export const login = async (req, res) => {
       });
     }
 
-    if (user.is_verified === 0) {
-      return res.status(401).json({
-        success: false,
-        message: "Please verify your email before logging in",
-      });
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -229,7 +85,6 @@ export const login = async (req, res) => {
     }
 
     if (!process.env.JWT_SECRET) {
-      console.log("JWT_SECRET missing in .env");
       return res.status(500).json({
         success: false,
         message: "JWT secret not configured",
@@ -253,6 +108,7 @@ export const login = async (req, res) => {
         role: user.role,
       },
     });
+
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     return res.status(500).json({
