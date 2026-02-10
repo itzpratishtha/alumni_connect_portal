@@ -1,5 +1,5 @@
 import express from "express";
-import { register , login } from "./auth.controller.js";
+import { register , login ,verifyOtp} from "./auth.controller.js";
 import { authRequired } from "../middleware/authMiddleware.js";
 
 
@@ -8,6 +8,7 @@ const router = express.Router();
 // Register user route
 router.post("/register", register);
 
+router.post("/verify-otp", verifyOtp);
 // Login user route (you already have login controller)
 router.post("/login", login);
 // Test route
