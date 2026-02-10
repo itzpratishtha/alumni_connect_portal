@@ -1,38 +1,26 @@
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Gmail App Password
-  },
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export async function sendOTPEmail(email, otp) {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.log("❌ Gmail env vars missing");
-      return false;
-    }
-
-    await transporter.sendMail({
-      from: `"PIET Alumni Connect" <${process.env.EMAIL_USER}>`,
+    const msg = {
       to: email,
+      from: "piet.alumni.connect@gmail.com", // must be verified ONCE in SendGrid
       subject: "Your OTP for Email Verification",
       html: `
-        <div style="font-family: Arial, sans-serif;">
-          <h2>Email Verification</h2>
-          <p>Your OTP is:</p>
-          <h1>${otp}</h1>
-          <p>This OTP is valid for 10 minutes.</p>
-        </div>
+        <h2>Email Verification</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>Valid for 10 minutes.</p>
       `,
-    });
+    };
 
-    console.log("✅ OTP SENT VIA GMAIL:", otp, "TO:", email);
+    await sgMail.send(msg);
+    console.log("✅ OTP SENT VIA SENDGRID:", otp, "TO:", email);
     return true;
   } catch (err) {
-    console.error("❌ GMAIL OTP ERROR:", err.message);
+    console.error("❌ SENDGRID ERROR:", err.response?.body || err.message);
     return false;
   }
 }
