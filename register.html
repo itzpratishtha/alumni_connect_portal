@@ -38,66 +38,18 @@
   </div>
 
   <!-- JS -->
-  <script src="/api.js"></script>
-
-  <script>
-    const form = document.getElementById("registerForm");
-    const registerBtn = document.getElementById("registerBtn");
-
-    // Prevent logged-in users from opening register page
-    if (localStorage.getItem("token")) {
-      window.location.href = "index.html";
+  <script src="api.js"></script>
+<script>
+  async function register() {
+    try {
+      await registerUser(name, email, password, role);
+      alert("Registered successfully. Please login.");
+      window.location.href = "login.html";
+    } catch (err) {
+      alert(err.message);
     }
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const role = document.getElementById("role").value;
-
-      if (!role) {
-        alert("Please select a role");
-        return;
-      }
-
-      // Disable button while request is processing
-      registerBtn.disabled = true;
-      registerBtn.innerText = "Registering...";
-
-      try {
-        const res = await apiCall("/api/auth/register", "POST", {
-          name,
-          email,
-          password,
-          role
-        });
-
-        // If backend returns college email restriction error
-        if (res.message && res.message.toLowerCase().includes("official college email")) {
-          alert(res.message);
-          registerBtn.disabled = false;
-          registerBtn.innerText = "Register";
-          return;
-        }
-
-        // ✅ Save email for OTP verification page
-        localStorage.setItem("pending_email", email);
-
-        alert("Registration successful! OTP sent to your email. Please verify OTP.");
-
-        // ✅ Redirect to OTP verification page
-        window.location.href = "verify-otp.html";
-
-      } catch (err) {
-        alert(err.message || "Registration failed");
-      } finally {
-        registerBtn.disabled = false;
-        registerBtn.innerText = "Register";
-      }
-    });
-  </script>
+  }
+</script>
 
 </body>
 </html>

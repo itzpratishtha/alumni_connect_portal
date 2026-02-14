@@ -1,15 +1,19 @@
-const BASE_URL = "studentalumniconnectportal-production-be61.up.railway.app";
+// ===============================
+// 🔗 BACKEND BASE URL (Railway)
+// ===============================
+const API_BASE =
+  "https://studentalumniconnectportal-production-be61.up.railway.app";
 
+// ===============================
+// 🔧 Generic API call helper
+// ===============================
+async function apiCall(endpoint, method = "GET", data = null, token = null) {
+  const headers = {
+    "Content-Type": "application/json",
+  };
 
-async function apiCall(endpoint, method = "GET", body = null, isFormData = false) {
-  const token = localStorage.getItem("token");
-
-  const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  // If not FormData, send JSON
-  if (!isFormData) {
-    headers["Content-Type"] = "application/json";
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   const options = {
@@ -17,26 +21,95 @@ async function apiCall(endpoint, method = "GET", body = null, isFormData = false
     headers,
   };
 
-  if (body) {
-    options.body = isFormData ? body : JSON.stringify(body);
+  if (data) {
+    options.body = JSON.stringify(data);
   }
 
-  const res = await fetch(`${BASE_URL}${endpoint}`, options);
-
-  // ✅ Read response safely (JSON or TEXT)
-  const text = await res.text();
-  let data;
-
+  let response;
   try {
-    data = text ? JSON.parse(text) : {};
-  } catch (e) {
-    // Backend didn't return JSON
-    throw new Error(text || "Server did not return JSON");
+    response = await fetch(`${API_BASE}${endpoint}`, options);
+  } catch (err) {
+    console.error("NETWORK ERROR:", err);
+    throw new Error("Unable to connect to server");
   }
 
-  if (!res.ok) {
-    throw new Error(data.message || "Request failed");
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("Invalid server response");
   }
 
-  return data;
+  if (!response.ok) {
+    throw new Error(result.message || "Request failed");
+  }
+
+  return result;
 }
+
+// ===============================
+// ✅ REGISTER USER
+// ===============================
+async function registerUser(name, email, password, role) {
+  return apiCall("/api/auth/register", "POST", {
+    name,
+    email,
+    password,
+    role,
+  });
+}
+
+// ===============================
+// ✅ LOGIN USER
+// ===============================
+async function loginUser(email, password) {
+  const res = await apiCall("/api/auth/login", "POST", {
+    email,
+    password,
+  });
+
+  // Save token + user
+  localStorage.setItem("auth_token", res.token);
+  localStorage.setItem("auth_user", JSON.stringify(res.user));
+
+  return res;
+}
+
+// ===============================
+// 🔐 GET AUTH TOKEN
+// ===============================
+function getAuthToken() {
+  return localStorage.getItem("auth_token");
+}
+
+// ===============================
+// 🔐 LOGOUT USER
+// ===============================
+function logoutUser() {
+  localStorage.removeItem("auth_token");
+  localStorage.removeItem("auth_user");
+  window.location.href = "login.html";
+}
+
+// ===============================
+// 🔐 PROTECTED API CALL
+// ===============================
+async function protectedApiCall(endpoint, method = "GET", data = null) {
+  const token = getAuthToken();
+  if (!token) {
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  return apiCall(endpoint, method, data, token);
+}
+
+// ===============================
+// 🧪 DEBUG (optional)
+// ===============================
+window.API_DEBUG = {
+  registerUser,
+  loginUser,
+  logoutUser,
+};
