@@ -1,18 +1,5 @@
 import cors from "cors";
 
-app.use(
-  cors({
-    origin: [
-      "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
-// IMPORTANT: handle preflight
-app.options("*", cors());
-
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
 
@@ -33,8 +20,20 @@ import { fileURLToPath } from "url";
 
 
 const app = express();
-
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: [
+      "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// IMPORTANT: handle preflight
+app.options("*", cors());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
