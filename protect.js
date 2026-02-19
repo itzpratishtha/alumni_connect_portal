@@ -1,6 +1,6 @@
 // protect.js — redirects user to login if not authenticated
 (function () {
-  const publicPages = ["login.html", "register.html", "verify-otp.html"];
+  const publicPages = ["login.html", "register.html"];
 
   const currentPage = window.location.pathname.split("/").pop();
 
@@ -13,7 +13,6 @@
   if (!token) {
     alert("Please login first.");
     window.location.href = "login.html";
-    return;
   }
 
   // ❌ DO NOT validate token on page load (causes instant logout on network issues)
