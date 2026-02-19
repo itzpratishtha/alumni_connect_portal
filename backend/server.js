@@ -1,4 +1,5 @@
 import cors from "cors";
+
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
 
@@ -19,27 +20,17 @@ import { fileURLToPath } from "url";
 
 
 const app = express();
-
-const allowedOrigins = [
-  "https://itzpratishtha.github.io",
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like curl, postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(null,false);
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: [
+      "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

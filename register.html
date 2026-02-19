@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/modern.css" />
+  <link rel="stylesheet" href="modern.css" />
 </head>
 
 <body class="auth-page">
@@ -27,7 +27,6 @@
         <option value="student">Student</option>
         <option value="alumni">Alumni</option>
       </select>
-
       <button type="submit" class="btn" id="registerBtn">Register</button>
     </form>
 
@@ -37,18 +36,44 @@
     </p>
   </div>
 
-  <!-- JS -->
-  <script src="api.js"></script>
+<script src="api.js"></script>
 <script>
-  async function register() {
-    try {
-      await registerUser(name, email, password, role);
-      alert("Registered successfully. Please login.");
-      window.location.href = "login.html";
-    } catch (err) {
-      alert(err.message);
+  const form = document.getElementById("registerForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // 🔥 STOP page refresh
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const role = document.getElementById("role").value;
+
+    if (!name || !email || !password || !role) {
+      alert("Please fill all fields");
+      return;
     }
-  }
+
+    try {
+      const res = await apiCall("/api/auth/register", "POST", {
+        name,
+        email,
+        password,
+        role,
+      });
+
+      alert(res.message || "Registered successfully!");
+
+      // save email for OTP page
+      localStorage.setItem("pending_email", email);
+
+      // redirect to verify OTP
+      window.location.href = "verify-otp.html";
+
+    } catch (err) {
+      console.error("REGISTER ERROR:", err);
+      alert(err.message || "Registration failed");
+    }
+  });
 </script>
 
 </body>
