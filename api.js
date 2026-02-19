@@ -2,7 +2,7 @@
 // 🔗 BACKEND BASE URL (Railway)
 // ===============================
 const API_BASE =
-  "https://studentalumniconnectportal-production-be61.up.railway.app";
+  "https://alumni-connect-portal-w0fm.onrender.com";
 
 // ===============================
 // 🔧 Generic API call helper
