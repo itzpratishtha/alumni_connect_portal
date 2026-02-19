@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
 
-import express from "express";
 import http from "http";          // NEW
 import { Server } from "socket.io"; // NEW
 
@@ -18,30 +17,34 @@ import resourceRoutes from "./src/resources/resource.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import express from "express";
 
 const app = express();
-app.use(express.json());
 
 const allowedOrigins = [
-  "https://alumniconnectportal-6pz7ijsuo-pratishtha-somanis-projects.vercel.app",
+  "https://alumniconnectportal-i56ilu127-pratishtha-somanis-projects.vercel.app",
+  "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
+  "http://localhost:3000"
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // allow server-to-server & tools like Postman
-      if (!origin) return callback(null, true);
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow Postman / server-to-server
+    if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-      return callback(new Error("Not allowed by CORS"));
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+    return callback(new Error("CORS blocked: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.use(express.json());
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
