@@ -28,20 +28,22 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow Postman / server-to-server
+  origin: (origin, callback) => {
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    if (
+      origin.endsWith(".vercel.app") ||
+      origin === "http://localhost:3000"
+    ) {
       return callback(null, true);
     }
 
-    return callback(new Error("CORS blocked: " + origin));
+    callback(new Error("CORS blocked"));
   },
-  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 app.use(express.json());
 
