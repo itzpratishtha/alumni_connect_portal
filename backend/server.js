@@ -22,11 +22,22 @@ import { fileURLToPath } from "url";
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = [
+  "https://alumniconnectportal-6pz7ijsuo-pratishtha-somanis-projects.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
-    ],
+    origin: function (origin, callback) {
+      // allow server-to-server & tools like Postman
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
