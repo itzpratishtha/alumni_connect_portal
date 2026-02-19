@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (confirm("Are you sure you want to logout?")) {
       localStorage.clear();
+      localStorage.removeItem("auth_token");
       window.location.href = "login.html";
     }
   });
