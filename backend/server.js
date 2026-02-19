@@ -20,24 +20,15 @@ import { fileURLToPath } from "url";
 
 const app = express();
 
-const allowedOrigins = [
-  "https://itzpratishtha.github.io",
-];
+app.use(
+  cors({
+    origin: [
+      "https://alumniconnectportal-qndy2s4g6-pratishtha-somanis-projects.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like curl, postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(null,false);
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
 
 app.use(express.json());
 
