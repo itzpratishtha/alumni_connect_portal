@@ -33,14 +33,40 @@
   <!-- JS -->
   <script src="api.js"></script>
 <script>
-  async function login() {
-    try {
-      await loginUser(email, password);
-      window.location.href = "index.html";
-    } catch (err) {
-      alert(err.message);
+  const form = document.getElementById("loginForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // 🔥 stop page refresh
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
     }
-  }
+
+    try {
+      const res = await apiCall("/api/auth/login", "POST", {
+        email,
+        password,
+      });
+
+      alert(res.message || "Login successful");
+
+      // save token (VERY IMPORTANT)
+      if (res.token) {
+        localStorage.setItem("auth_token", res.token);
+      }
+
+      // redirect after login
+      window.location.href = "index.html";
+
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+      alert(err.message || "Login failed");
+    }
+  });
 </script>
 
 </body>
