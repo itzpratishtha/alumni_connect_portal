@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const name = localStorage.getItem("name");
-  const photo = localStorage.getItem("profilePhoto");
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return;
+
+  const name = user.name;
+  const photo = user.profilePhoto;
+
 
   // ✅ correct backend URL
-  const backendURL = "http://localhost:5001";
+  const backendURL = "https://alumni-connect-portal-w0fm.onrender.com";
 
   const navUser = document.getElementById("navUser");
   if (!name || !navUser) return;

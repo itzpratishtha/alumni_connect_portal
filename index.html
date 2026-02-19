@@ -119,8 +119,9 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const name = localStorage.getItem("name");
-    document.getElementById("userName").innerText = name ? name : "User";
+    const user = JSON.parse(localStorage.getItem("user"));
+    document.getElementById("userName").innerText = user?.name || "User";
+
   });
 </script>
 

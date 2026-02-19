@@ -1,26 +1,15 @@
-// roleNavbar.js — show/hide navbar items based on role
+// roleNavbar.js — FINAL & CORRECT
 
-(function () {
-  const role = localStorage.getItem("role");
-  const token = localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return;
 
-  if (!token || !role) return;
+  const role = user.role;
 
-  const links = document.querySelectorAll("[data-role]");
-
-  links.forEach(link => {
-    const allowedRoles = link.dataset.role.split(",");
-
+  document.querySelectorAll("[data-role]").forEach(el => {
+    const allowedRoles = el.dataset.role.split(",");
     if (!allowedRoles.includes(role)) {
-      link.style.display = "none";
+      el.style.display = "none";
     }
   });
-
-})();
-
-document.querySelectorAll("[data-role]").forEach(el => {
-  const allowedRoles = el.dataset.role.split(",");
-  if (!allowedRoles.includes(role)) {
-    el.style.display = "none";
-  }
 });
