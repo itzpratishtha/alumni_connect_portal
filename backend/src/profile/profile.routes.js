@@ -1,7 +1,6 @@
 import express from "express";
 import {
   getMyProfile,
-  createOrUpdateProfile,
   uploadPhoto,
   deletePhoto,
   updateMyProfile

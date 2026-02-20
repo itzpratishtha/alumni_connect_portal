@@ -3,51 +3,45 @@ import { createProfile, updateProfile, getProfileByUserId } from "../models/Prof
 
 export const getMyProfile = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `SELECT id, name, email, role, batch, domain, company, location, linkedin, github, photo
-       FROM users WHERE id = ?`,
-      [req.user.id]
-    );
+    const profile = await getProfileByUserId(req.user.id);
 
-    if (!rows.length) {
-      return res.status(404).json({ message: "Profile not found" });
+    if (!profile) {
+      return res.status(200).json({
+        user_id: req.user.id,
+        phone: "",
+        bio: "",
+        profile_image: "",
+        linkedin: "",
+        github: "",
+        batch: "",
+        domain: "",
+        company: "",
+        location: "",
+      });
     }
 
-    res.json(rows[0]);
+    res.json(profile);
   } catch (err) {
     console.error("GET PROFILE ERROR:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Failed to load profile" });
   }
 };
 
 // PUT /api/profile/me
 export const updateMyProfile = async (req, res) => {
   try {
-    const {
-      name,
-      batch,
-      domain,
-      company,
-      location,
-      linkedin,
-      github,
-    } = req.body;
+    const existingProfile = await getProfileByUserId(req.user.id);
 
-    await pool.query(
-      `UPDATE users SET
-        name = ?, batch = ?, domain = ?, company = ?, location = ?, linkedin = ?, github = ?
-       WHERE id = ?`,
-      [name, batch, domain, company, location, linkedin, github, req.user.id]
-    );
+    if (!existingProfile) {
+      await createProfile(req.user.id, req.body);
+    } else {
+      await updateProfile(req.user.id, req.body);
+    }
 
-    // 🔥 RETURN UPDATED USER (CRITICAL)
-    const [rows] = await pool.query(
-      `SELECT id, name, email, role, batch, domain, company, location, linkedin, github, photo
-       FROM users WHERE id = ?`,
-      [req.user.id]
-    );
+    // 🔥 RETURN UPDATED PROFILE (CRITICAL)
+    const updatedProfile = await getProfileByUserId(req.user.id);
+    res.status(200).json(updatedProfile);
 
-    res.json(rows[0]);
   } catch (err) {
     console.error("UPDATE PROFILE ERROR:", err);
     res.status(500).json({ message: "Profile update failed" });
