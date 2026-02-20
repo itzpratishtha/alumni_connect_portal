@@ -55,9 +55,10 @@
       alert(res.message || "Login successful");
 
       // save token (VERY IMPORTANT)
-      if (res.token) {
+      if (res.token && res.user) {
         localStorage.setItem("auth_token", res.token);
-      }
+        localStorage.setItem("user", JSON.stringify(res.user)); // 🔥 THIS LINE
+}
 
       // redirect after login
       window.location.href = "index.html";
