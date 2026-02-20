@@ -1,32 +1,56 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 import { createProfile, updateProfile, getProfileByUserId } from "../models/ProfileModel.js";
 
 export const getMyProfile = async (req, res) => {
   try {
-    const profile = await getProfileByUserId(req.user.id);
-    return res.status(200).json({ success: true, profile: profile || {} });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    const [rows] = await pool.query(
+      `SELECT id, name, email, role, batch, domain, company, location, linkedin, github, photo
+       FROM users WHERE id = ?`,
+      [req.user.id]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("GET PROFILE ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-export const createOrUpdateProfile = async (req, res) => {
+// PUT /api/profile/me
+export const updateMyProfile = async (req, res) => {
   try {
-    const profile = await getProfileByUserId(req.user.id);
+    const {
+      name,
+      batch,
+      domain,
+      company,
+      location,
+      linkedin,
+      github,
+    } = req.body;
 
-    if (!profile) {
-      await createProfile(req.user.id, req.body);
-    } else {
-      await updateProfile(req.user.id, req.body);
-    }
+    await pool.query(
+      `UPDATE users SET
+        name = ?, batch = ?, domain = ?, company = ?, location = ?, linkedin = ?, github = ?
+       WHERE id = ?`,
+      [name, batch, domain, company, location, linkedin, github, req.user.id]
+    );
 
-    // 🔥 ALWAYS return updated profile
-    const updatedProfile = await getProfileByUserId(req.user.id);
+    // 🔥 RETURN UPDATED USER (CRITICAL)
+    const [rows] = await pool.query(
+      `SELECT id, name, email, role, batch, domain, company, location, linkedin, github, photo
+       FROM users WHERE id = ?`,
+      [req.user.id]
+    );
 
-    return res.status(200).json(updatedProfile);
-  } catch (error) {
-    console.error("PROFILE UPDATE ERROR:", error);
-    return res.status(500).json({ message: "Profile update failed" });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("UPDATE PROFILE ERROR:", err);
+    res.status(500).json({ message: "Profile update failed" });
   }
 };
 
