@@ -1,13 +1,11 @@
 // ===============================
 // 🔗 BACKEND BASE URL (Railway)
 // ===============================
-const API_BASE =
-  "https://alumni-connect-portal-w0fm.onrender.com";
+const API_BASE = "https://alumni-connect-portal-w0fm.onrender.com";
 
-// ===============================
-// 🔧 Generic API call helper
-// ===============================
-async function apiCall(endpoint, method = "GET", data = null, token = null) {
+async function apiCall(endpoint, method = "GET", data = null) {
+  const token = localStorage.getItem("auth_token"); // 🔥 AUTO READ
+
   const headers = {
     "Content-Type": "application/json",
   };
@@ -46,7 +44,6 @@ async function apiCall(endpoint, method = "GET", data = null, token = null) {
 
   return result;
 }
-
 // ===============================
 // ✅ REGISTER USER
 // ===============================
