@@ -1,49 +1,49 @@
-// navbarUser.js — FINAL PROFILE DROPDOWN
-
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("profile-container");
-  if (!container) return;
+  const navbarRight = document.getElementById("navbarUser");
 
-  const userRaw = localStorage.getItem("user");
-  if (!userRaw) return;
+  if (!navbarRight) return;
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-if (user?.photo) {
-  profileImg.src = API_BASE + user.photo;
-} else {
-  profileImg.src = "https://ui-avatars.com/api/?name=" + user.name;
-}
+  // ❌ Not logged in
+  if (!user) return;
 
-  container.innerHTML = `
-    <div class="profile-wrapper">
-      <div class="profile-circle" id="profileBtn">
-        ${user.name.charAt(0).toUpperCase()}
-      </div>
+  // Create wrapper
+  const wrapper = document.createElement("div");
+  wrapper.className = "profile-wrapper";
 
-      <div class="profile-dropdown" id="profileDropdown">
-        <a href="profile.html">View Profile</a>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
+  // Create avatar
+  const avatar = document.createElement("img");
+  avatar.className = "profile-avatar";
+
+  if (user.photo) {
+    avatar.src = API_BASE + user.photo;
+  } else {
+    avatar.src =
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(user.name);
+  }
+
+  // Dropdown
+  const dropdown = document.createElement("div");
+  dropdown.className = "profile-dropdown";
+  dropdown.innerHTML = `
+    <a href="profile.html">View Profile</a>
+    <button id="logoutBtn">Logout</button>
   `;
 
-  const profileBtn = document.getElementById("profileBtn");
-  const dropdown = document.getElementById("profileDropdown");
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(dropdown);
+  navbarRight.appendChild(wrapper);
 
-  profileBtn.addEventListener("click", () => {
+  // Toggle dropdown
+  avatar.addEventListener("click", () => {
     dropdown.classList.toggle("show");
   });
 
+  // Logout
   document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "login.html";
-  });
-
-  // close dropdown on outside click
-  document.addEventListener("click", (e) => {
-    if (!profileBtn.contains(e.target)) {
-      dropdown.classList.remove("show");
-    }
   });
 });
