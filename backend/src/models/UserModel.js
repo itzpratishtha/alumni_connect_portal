@@ -1,8 +1,8 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 // CREATE USER
 export async function createUser(name, email, password, role) {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
     [name, email, password, role]
   );
@@ -11,7 +11,7 @@ export async function createUser(name, email, password, role) {
 
 // FIND USER BY EMAIL
 export async function findUserByEmail(email) {
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     "SELECT * FROM users WHERE email = ? LIMIT 1",
     [email]
   );
@@ -20,7 +20,7 @@ export async function findUserByEmail(email) {
 
 // FIND USER BY ID
 export async function findUserById(id) {
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     "SELECT * FROM users WHERE id = ? LIMIT 1",
     [id]
   );
@@ -28,14 +28,14 @@ export async function findUserById(id) {
 }
 
 export const saveOTP = async (userId, otp, expires) => {
-  await db.query(
+  await pool.query(
     "UPDATE users SET otp=?, otp_expires=? WHERE id=?",
     [otp, expires, userId]
   );
 };
 
 export const verifyUserOTP = async (email, otp) => {
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     "SELECT * FROM users WHERE email=? AND otp=?",
     [email, otp]
   );
@@ -43,7 +43,7 @@ export const verifyUserOTP = async (email, otp) => {
 };
 
 export const markUserVerified = async (userId) => {
-  await db.query(
+  await pool.query(
     "UPDATE users SET is_verified=1, otp=NULL, otp_expires=NULL WHERE id=?",
     [userId]
   );

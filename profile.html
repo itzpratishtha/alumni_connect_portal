@@ -107,17 +107,18 @@
   <script src="mobileNav.js"></script>
 
 <script>
-
   const form = document.getElementById("profileForm");
-  const backendURL = "https://alumni-connect-portal-w0fm.onrender.com";
+  const API_BASE = "https://alumni-connect-portal-w0fm.onrender.com";
+  const token = localStorage.getItem("auth_token");
 
-  // ✅ Load Profile
+  // =========================
+  // LOAD PROFILE
+  // =========================
   async function loadProfile() {
     try {
       const res = await apiCall("/api/profile/me", "GET");
 
-      // if backend returns { success:true, profile:{...} }
-      const profile = res.profile ? res.profile : res;
+      const profile = res.profile || res;
 
       document.getElementById("name").value = profile.name || "";
       document.getElementById("email").value = profile.email || "";
@@ -128,13 +129,18 @@
       document.getElementById("linkedin").value = profile.linkedin || "";
       document.getElementById("github").value = profile.github || "";
 
+      // 🔥 keep localStorage in sync
+      localStorage.setItem("user", JSON.stringify(profile));
+
     } catch (err) {
       console.error("LOAD PROFILE ERROR:", err);
       alert(err.message || "Failed to load profile");
     }
   }
 
-  // ✅ Update Profile
+  // =========================
+  // UPDATE PROFILE
+  // =========================
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -145,22 +151,27 @@
       company: document.getElementById("company").value.trim(),
       location: document.getElementById("location").value.trim(),
       linkedin: document.getElementById("linkedin").value.trim(),
-      github: document.getElementById("github").value.trim()
+      github: document.getElementById("github").value.trim(),
     };
 
     try {
-      const res = await apiCall("/api/profile/update", "POST", data);
-      alert(res.message || "Profile updated successfully!");
+      const updatedUser = await apiCall("/api/profile/me", "PUT", data);
+
+      // 🔥 update local storage so UI reflects changes
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      alert("Profile updated successfully!");
     } catch (err) {
       console.error("UPDATE PROFILE ERROR:", err);
       alert(err.message || "Failed to update profile");
     }
   });
 
-  // ✅ Upload Photo
+  // =========================
+  // UPLOAD PHOTO
+  // =========================
   async function uploadPhoto() {
     const input = document.getElementById("photoInput");
-
     if (!input.files.length) {
       alert("Please select a photo");
       return;
@@ -170,71 +181,65 @@
     formData.append("photo", input.files[0]);
 
     try {
-      const res = await fetch(`${backendURL}/api/profile/upload-photo`, {
+      const res = await fetch(`${API_BASE}/api/profile/photo`, {
         method: "POST",
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: "Bearer " + token, // 🔥 FIXED
         },
         body: formData,
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
 
-      if (!res.ok) {
-        alert(data.message || "Upload failed");
-        return;
-      }
-
-      // ✅ SAVE PHOTO PATH
       localStorage.setItem("profilePhoto", data.photo);
-
       alert("Photo uploaded successfully");
-      window.location.reload();
+      location.reload();
     } catch (err) {
       console.error("UPLOAD ERROR:", err);
-      alert("Upload error");
+      alert(err.message || "Upload error");
     }
   }
 
-  // ✅ Show Photo Preview
-  const photo = localStorage.getItem("profilePhoto");
+  // =========================
+  // SHOW PHOTO
+  // =========================
   const preview = document.getElementById("profilePhotoPreview");
+  const photo = localStorage.getItem("profilePhoto");
 
   if (preview) {
-    if (photo) {
-      preview.src = backendURL + photo;
-    } else {
-      preview.src = "../assets/default-avatar.png";
-    }
+    preview.src = photo
+      ? API_BASE + photo
+      : "assets/default-avatar.png";
   }
 
-  // ✅ Delete Photo
+  // =========================
+  // DELETE PHOTO
+  // =========================
   async function deletePhoto() {
     try {
-      const res = await fetch(`${backendURL}/api/profile/delete-photo`, {
+      const res = await fetch(`${API_BASE}/api/profile/photo`, {
         method: "DELETE",
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: "Bearer " + token, // 🔥 FIXED
         },
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Delete failed");
-        return;
-      }
+      if (!res.ok) throw new Error(data.message);
 
       localStorage.removeItem("profilePhoto");
       alert("Photo deleted");
       location.reload();
     } catch (err) {
       console.error("DELETE PHOTO ERROR:", err);
-      alert("Delete error");
+      alert(err.message || "Delete error");
     }
   }
 
-  // ✅ Role Upgrade Request
+  // =========================
+  // ROLE UPGRADE REQUEST
+  // =========================
   async function requestUpgrade() {
     try {
       const res = await apiCall("/api/profile/request-role-upgrade", "POST");
@@ -245,7 +250,6 @@
     }
   }
 
-  // Load profile on page open
   loadProfile();
 </script>
 
