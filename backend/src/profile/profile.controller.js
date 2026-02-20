@@ -16,14 +16,17 @@ export const createOrUpdateProfile = async (req, res) => {
 
     if (!profile) {
       await createProfile(req.user.id, req.body);
-      return res.status(201).json({ success: true, message: "Profile created" });
+    } else {
+      await updateProfile(req.user.id, req.body);
     }
 
-    await updateProfile(req.user.id, req.body);
-    return res.status(200).json({ success: true, message: "Profile updated" });
+    // 🔥 ALWAYS return updated profile
+    const updatedProfile = await getProfileByUserId(req.user.id);
 
+    return res.status(200).json(updatedProfile);
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("PROFILE UPDATE ERROR:", error);
+    return res.status(500).json({ message: "Profile update failed" });
   }
 };
 
