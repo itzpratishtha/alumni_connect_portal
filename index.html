@@ -108,18 +108,20 @@
   </footer>
 
   <!-- JS -->
+   <script src="api.js"></script>
   <script src="protect.js"></script>
+  <script src="navbarUser.js"></script>
   <script src="roleNavbar.js"></script>
   <script src="logout.js"></script>
-  <script src="navbarUser.js"></script>
   <script src="mobileNav.js"></script>
 
 
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const name = localStorage.getItem("name");
-    document.getElementById("userName").innerText = name ? name : "User";
+    const user = JSON.parse(localStorage.getItem("user"));
+    document.getElementById("userName").innerText = user?.name || "User";
+
   });
 </script>
 

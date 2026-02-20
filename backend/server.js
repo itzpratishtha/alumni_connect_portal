@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
 
-import express from "express";
 import http from "http";          // NEW
 import { Server } from "socket.io"; // NEW
 
@@ -18,19 +17,36 @@ import resourceRoutes from "./src/resources/resource.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import express from "express";
 
 const app = express();
+
+const allowedOrigins = [
+  "https://alumniconnectportal-i56ilu127-pratishtha-somanis-projects.vercel.app",
+  "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
+  "http://localhost:3000"
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    if (
+      origin.endsWith(".vercel.app") ||
+      origin === "http://localhost:3000"
+    ) {
+      return callback(null, true);
+    }
+
+    callback(new Error("CORS blocked"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: [
-      "https://alumniconnectportal-62abmkbyd-pratishtha-somanis-projects.vercel.app",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
