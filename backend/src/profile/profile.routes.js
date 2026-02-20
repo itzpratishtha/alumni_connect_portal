@@ -16,7 +16,7 @@ const router = express.Router();
 router.get("/me", verifyToken, getMyProfile);
 
 // Create or Update profile
-router.post("/me", verifyToken, updateMyProfile);
+router.put("/me", verifyToken, updateMyProfile);
 
 router.post("/upload-photo", verifyToken, upload.single("photo"), uploadPhoto);
 
