@@ -58,8 +58,8 @@
 
 <h3 style="margin-top:20px;">Profile Photo</h3>
 <input type="file" id="photoInput" accept="image/*">
-<button class="btn" onclick="uploadPhoto()">Replace Photo</button>
-<button class="btn danger" onclick="deletePhoto()">Delete Photo</button>
+<button id="uploadPhotoBtn">Replace Photo</button>
+<button id="deletePhotoBtn">Delete Photo</button>
 
 
     <!-- PROFILE FORM -->
@@ -108,7 +108,6 @@
 
 <script>
   const form = document.getElementById("profileForm");
-  const API_BASE = "https://alumni-connect-portal-w0fm.onrender.com";
   const token = localStorage.getItem("auth_token");
 
   // =========================
@@ -138,6 +137,16 @@
     }
   }
 
+  const uploadBtn = document.getElementById("uploadPhotoBtn");
+  if (uploadBtn) {
+   uploadBtn.addEventListener("click", uploadPhoto);
+  }
+
+const deleteBtn = document.getElementById("deletePhotoBtn");
+if (deleteBtn) {
+  deleteBtn.addEventListener("click", deletePhoto);
+}
+
   // =========================
   // UPDATE PROFILE
   // =========================
@@ -155,7 +164,7 @@
     };
 
     try {
-      const updatedUser = await apiCall("/api/profile/me", "PUT", data);
+      const updatedUser = await apiCall("/api/profile/update", "PUT", data);
 
       // 🔥 update local storage so UI reflects changes
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -181,7 +190,7 @@
     formData.append("photo", input.files[0]);
 
     try {
-      const res = await fetch(`${API_BASE}/api/profile/photo`, {
+      const res = await fetch(`${API_BASE}/api/profile/upload-photo`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token, // 🔥 FIXED
@@ -205,12 +214,14 @@
   // SHOW PHOTO
   // =========================
   const preview = document.getElementById("profilePhotoPreview");
-  const photo = localStorage.getItem("profilePhoto");
+  const user = JSON.parse(localStorage.getItem("user"));
+  user.photo = data.photo;
+  localStorage.setItem("user", JSON.stringify(user));
 
   if (preview) {
     preview.src = photo
       ? API_BASE + photo
-      : "assets/default-avatar.png";
+      : "https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff";
   }
 
   // =========================
@@ -218,14 +229,22 @@
   // =========================
   async function deletePhoto() {
     try {
-      const res = await fetch(`${API_BASE}/api/profile/photo`, {
+      const res = await fetch(`${API_BASE}/api/profile/delete-photo`, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + token, // 🔥 FIXED
         },
       });
 
-      const data = await res.json();
+      let data;
+      const text = await res.text();
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+      console.error("Non-JSON response:", text);
+      throw new Error("Server returned invalid response");
+      }
       if (!res.ok) throw new Error(data.message);
 
       localStorage.removeItem("profilePhoto");
