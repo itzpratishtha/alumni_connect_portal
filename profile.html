@@ -137,14 +137,16 @@
     }
   }
 
-  document
-  .getElementById("uploadPhotoBtn")
-  .addEventListener("click", uploadPhoto);
+  const uploadBtn = document.getElementById("uploadPhotoBtn");
+  if (uploadBtn) {
+   uploadBtn.addEventListener("click", uploadPhoto);
+  }
 
-document
-  .getElementById("deletePhotoBtn")
-  .addEventListener("click", deletePhoto);
-  
+const deleteBtn = document.getElementById("deletePhotoBtn");
+if (deleteBtn) {
+  deleteBtn.addEventListener("click", deletePhoto);
+}
+
   // =========================
   // UPDATE PROFILE
   // =========================
@@ -188,7 +190,7 @@ document
     formData.append("photo", input.files[0]);
 
     try {
-      const res = await fetch(`${API_BASE}/api/profile/photo`, {
+      const res = await fetch(`${API_BASE}/api/profile/upload-photo`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token, // 🔥 FIXED
@@ -217,7 +219,7 @@ document
   if (preview) {
     preview.src = photo
       ? API_BASE + photo
-      : "assets/default-avatar.png";
+      : "https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff";
   }
 
   // =========================
@@ -225,14 +227,22 @@ document
   // =========================
   async function deletePhoto() {
     try {
-      const res = await fetch(`${API_BASE}/api/profile/photo`, {
+      const res = await fetch(`${API_BASE}/api/profile/delete-photo`, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + token, // 🔥 FIXED
         },
       });
 
-      const data = await res.json();
+      let data;
+      const text = await res.text();
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+      console.error("Non-JSON response:", text);
+      throw new Error("Server returned invalid response");
+      }
       if (!res.ok) throw new Error(data.message);
 
       localStorage.removeItem("profilePhoto");
