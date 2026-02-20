@@ -164,7 +164,7 @@ if (deleteBtn) {
     };
 
     try {
-      const updatedUser = await apiCall("/api/profile/me", "PUT", data);
+      const updatedUser = await apiCall("/api/profile/update", "PUT", data);
 
       // 🔥 update local storage so UI reflects changes
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -214,7 +214,9 @@ if (deleteBtn) {
   // SHOW PHOTO
   // =========================
   const preview = document.getElementById("profilePhotoPreview");
-  const photo = localStorage.getItem("profilePhoto");
+  const user = JSON.parse(localStorage.getItem("user"));
+  user.photo = data.photo;
+  localStorage.setItem("user", JSON.stringify(user));
 
   if (preview) {
     preview.src = photo

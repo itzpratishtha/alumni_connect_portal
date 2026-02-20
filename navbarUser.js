@@ -7,7 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const userRaw = localStorage.getItem("user");
   if (!userRaw) return;
 
-  const user = JSON.parse(userRaw);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+if (user?.photo) {
+  profileImg.src = API_BASE + user.photo;
+} else {
+  profileImg.src = "https://ui-avatars.com/api/?name=" + user.name;
+}
 
   container.innerHTML = `
     <div class="profile-wrapper">
