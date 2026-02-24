@@ -32,11 +32,11 @@
 
   <!-- JS -->
   <script src="api.js"></script>
-<script>
+  <script>
   const form = document.getElementById("loginForm");
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // 🔥 stop page refresh
+    e.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -47,6 +47,7 @@
     }
 
     try {
+      // Backend sets HTTP-only cookie
       const res = await apiCall("/api/auth/login", "POST", {
         email,
         password,
@@ -54,13 +55,10 @@
 
       alert(res.message || "Login successful");
 
-      // save token (VERY IMPORTANT)
-      if (res.token && res.user) {
-        localStorage.setItem("auth_token", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user)); // 🔥 THIS LINE
-}
+      // ❌ No localStorage
+      // ❌ No token handling
+      // ✅ Cookie is already set by backend
 
-      // redirect after login
       window.location.href = "index.html";
 
     } catch (err) {
@@ -69,6 +67,5 @@
     }
   });
 </script>
-
 </body>
 </html>

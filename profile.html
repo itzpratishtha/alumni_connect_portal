@@ -108,21 +108,25 @@
 
 <script>
   const form = document.getElementById("profileForm");
-  const token = localStorage.getItem("auth_token");
+
+  let authUser = null;
 
   // =========================
   // LOAD PROFILE
   // =========================
   async function loadProfile() {
     try {
-      const res = await apiCall("/api/profile/me", "GET");
+      // 1️⃣ Get authenticated user from backend
+      authUser = await apiCall("/api/auth/me");
 
-      const profile = res.profile || res;
+      // 2️⃣ Get profile data
+      const profile = await apiCall("/api/profile/me");
 
-      const authUser = JSON.parse(localStorage.getItem("user"));
+      // Basic user info
+      document.getElementById("name").value = authUser?.name || "";
+      document.getElementById("email").value = authUser?.email || "";
 
-document.getElementById("name").value = authUser?.name || "";
-document.getElementById("email").value = authUser?.email || "";
+      // Profile fields
       document.getElementById("batch").value = profile.batch || "";
       document.getElementById("domain").value = profile.domain || "";
       document.getElementById("company").value = profile.company || "";
@@ -130,23 +134,20 @@ document.getElementById("email").value = authUser?.email || "";
       document.getElementById("linkedin").value = profile.linkedin || "";
       document.getElementById("github").value = profile.github || "";
 
-      
+      // Profile photo preview
+      const preview = document.getElementById("profilePhotoPreview");
+      if (preview) {
+        preview.src = authUser.photo
+          ? API_BASE + authUser.photo
+          : "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(authUser.name || "User");
+      }
 
     } catch (err) {
       console.error("LOAD PROFILE ERROR:", err);
       alert(err.message || "Failed to load profile");
     }
   }
-
-  const uploadBtn = document.getElementById("uploadPhotoBtn");
-  if (uploadBtn) {
-   uploadBtn.addEventListener("click", uploadPhoto);
-  }
-
-const deleteBtn = document.getElementById("deletePhotoBtn");
-if (deleteBtn) {
-  deleteBtn.addEventListener("click", deletePhoto);
-}
 
   // =========================
   // UPDATE PROFILE
@@ -155,7 +156,6 @@ if (deleteBtn) {
     e.preventDefault();
 
     const data = {
-      name: document.getElementById("name").value.trim(),
       batch: document.getElementById("batch").value.trim(),
       domain: document.getElementById("domain").value.trim(),
       company: document.getElementById("company").value.trim(),
@@ -189,38 +189,21 @@ if (deleteBtn) {
     try {
       const res = await fetch(`${API_BASE}/api/profile/upload-photo`, {
         method: "POST",
-        headers: {
-          Authorization: "Bearer " + token, // 🔥 FIXED
-        },
+        credentials: "include", // 🔐 cookie auth
         body: formData,
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      const user = JSON.parse(localStorage.getItem("user"));
-      user.photo = data.photo;
-      localStorage.setItem("user", JSON.stringify(user));
       alert("Photo uploaded successfully");
       location.reload();
+
     } catch (err) {
       console.error("UPLOAD ERROR:", err);
       alert(err.message || "Upload error");
     }
   }
-
-  // =========================
-  // SHOW PHOTO
-  // =========================
-const preview = document.getElementById("profilePhotoPreview");
-const user = JSON.parse(localStorage.getItem("user"));
-
-if (preview) {
-  preview.src = user?.photo
-    ? API_BASE + user.photo
-    : "https://ui-avatars.com/api/?name=" +
-      encodeURIComponent(user?.name || "User");
-}
 
   // =========================
   // DELETE PHOTO
@@ -229,25 +212,15 @@ if (preview) {
     try {
       const res = await fetch(`${API_BASE}/api/profile/delete-photo`, {
         method: "DELETE",
-        headers: {
-          Authorization: "Bearer " + token, // 🔥 FIXED
-        },
+        credentials: "include", // 🔐 cookie auth
       });
 
-      let data;
-      const text = await res.text();
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-      console.error("Non-JSON response:", text);
-      throw new Error("Server returned invalid response");
-      }
+      const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      localStorage.removeItem("profilePhoto");
       alert("Photo deleted");
       location.reload();
+
     } catch (err) {
       console.error("DELETE PHOTO ERROR:", err);
       alert(err.message || "Delete error");
@@ -255,20 +228,18 @@ if (preview) {
   }
 
   // =========================
-  // ROLE UPGRADE REQUEST
+  // BUTTON HANDLERS
   // =========================
-  async function requestUpgrade() {
-    try {
-      const res = await apiCall("/api/profile/request-role-upgrade", "POST");
-      alert(res.message || "Request sent");
-    } catch (err) {
-      console.error("ROLE UPGRADE ERROR:", err);
-      alert(err.message || "Failed to request upgrade");
-    }
-  }
+  const uploadBtn = document.getElementById("uploadPhotoBtn");
+  if (uploadBtn) uploadBtn.addEventListener("click", uploadPhoto);
 
+  const deleteBtn = document.getElementById("deletePhotoBtn");
+  if (deleteBtn) deleteBtn.addEventListener("click", deletePhoto);
+
+  // =========================
+  // INIT
+  // =========================
   loadProfile();
 </script>
-
 </body>
 </html>

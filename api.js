@@ -1,42 +1,24 @@
 // ===============================
-// 🔗 BACKEND BASE URL (Railway)
+// 🔗 BACKEND BASE URL
 // ===============================
 const API_BASE = "https://alumni-connect-portal-w0fm.onrender.com";
 
+// ===============================
+// 🌐 CORE API CALL
+// ===============================
 async function apiCall(endpoint, method = "GET", data = null) {
-  const token = localStorage.getItem("auth_token"); // 🔥 AUTO READ
-
-  const headers = {
-    "Content-Type": "application/json",
-  };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
   const options = {
     method,
-    headers,
+    headers: { "Content-Type": "application/json" },
+    credentials: "include" // 🔐 cookie auto-sent
   };
 
   if (data) {
     options.body = JSON.stringify(data);
   }
 
-  let response;
-  try {
-    response = await fetch(`${API_BASE}${endpoint}`, options);
-  } catch (err) {
-    console.error("NETWORK ERROR:", err);
-    throw new Error("Unable to connect to server");
-  }
-
-  let result;
-  try {
-    result = await response.json();
-  } catch {
-    throw new Error("Invalid server response");
-  }
+  const response = await fetch(API_BASE + endpoint, options);
+  const result = await response.json();
 
   if (!response.ok) {
     throw new Error(result.message || "Request failed");
@@ -44,6 +26,7 @@ async function apiCall(endpoint, method = "GET", data = null) {
 
   return result;
 }
+
 // ===============================
 // ✅ REGISTER USER
 // ===============================
@@ -52,7 +35,7 @@ async function registerUser(name, email, password, role) {
     name,
     email,
     password,
-    role,
+    role
   });
 }
 
@@ -60,46 +43,19 @@ async function registerUser(name, email, password, role) {
 // ✅ LOGIN USER
 // ===============================
 async function loginUser(email, password) {
-  const res = await apiCall("/api/auth/login", "POST", {
+  // Cookie is set by backend automatically
+  return apiCall("/api/auth/login", "POST", {
     email,
-    password,
+    password
   });
-
-  // Save token + user
-  localStorage.setItem("auth_token", res.token);
-  localStorage.setItem("user", JSON.stringify(res.user));
-
-  return res;
 }
 
 // ===============================
-// 🔐 GET AUTH TOKEN
+// ✅ LOGOUT USER
 // ===============================
-function getAuthToken() {
-  return localStorage.getItem("auth_token");
-}
-
-// ===============================
-// 🔐 LOGOUT USER
-// ===============================
-function logoutUser() {
-  localStorage.removeItem("auth_token");
-  localStorage.removeItem("auth_user");
+async function logoutUser() {
+  await apiCall("/api/auth/logout", "POST");
   window.location.href = "login.html";
-}
-
-// ===============================
-// 🔐 PROTECTED API CALL
-// ===============================
-async function protectedApiCall(endpoint, method = "GET", data = null) {
-  const token = getAuthToken();
-  if (!token) {
-    alert("Please login first");
-    window.location.href = "login.html";
-    return;
-  }
-
-  return apiCall(endpoint, method, data, token);
 }
 
 // ===============================
@@ -108,5 +64,5 @@ async function protectedApiCall(endpoint, method = "GET", data = null) {
 window.API_DEBUG = {
   registerUser,
   loginUser,
-  logoutUser,
+  logoutUser
 };

@@ -41,7 +41,7 @@
   const form = document.getElementById("registerForm");
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // 🔥 STOP page refresh
+    e.preventDefault(); // stop page refresh
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -63,10 +63,6 @@
 
       alert(res.message || "Registered successfully!");
 
-      // save email for OTP page
-      localStorage.setItem("pending_email", email);
-
-      // redirect to verify OTP
       window.location.href = "login.html";
 
     } catch (err) {

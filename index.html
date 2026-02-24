@@ -122,10 +122,15 @@
 
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    document.getElementById("userName").innerText = user?.name || "User";
-
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const user = await apiCall("/api/auth/me");
+      document.getElementById("userName").innerText = user?.name || "User";
+    } catch (err) {
+      // If not authenticated, fallback text (protect.js will redirect)
+      document.getElementById("userName").innerText = "User";
+    }
   });
+
 </script>
 

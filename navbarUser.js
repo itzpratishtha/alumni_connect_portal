@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!navbarRight) return;
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = await apiCall("/api/auth/me");
 
   // ❌ Not logged in
   if (!user) return;

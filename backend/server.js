@@ -1,4 +1,6 @@
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
 dotenv.config({path: "./.env"});
@@ -40,13 +42,34 @@ app.use(cors({
 
     callback(new Error("CORS blocked"));
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"]
 }));
 
+io.use((socket, next) => {
+  try {
+    const cookieHeader = socket.handshake.headers.cookie;
+    if (!cookieHeader) return next(new Error("Not authenticated"));
+
+    const tokenCookie = cookieHeader
+      .split("; ")
+      .find(c => c.startsWith("token="));
+
+    if (!tokenCookie) return next(new Error("No token"));
+
+    const token = tokenCookie.split("=")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    socket.user = decoded; // { id, role }
+    next();
+
+  } catch (err) {
+    next(new Error("Authentication failed"));
+  }
+});
 
 app.use(express.json());
-
+app.use(cookieParser());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,34 +84,36 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
-
 io.on("connection", (socket) => {
-  console.log("New user connected:", socket.id);
+  console.log("Socket user connected:", socket.user.id);
 
-  // Joining private chat room
-  socket.on("joinRoom", ({ senderId, receiverId }) => {
+  socket.on("joinRoom", ({ receiverId }) => {
+    const senderId = socket.user.id;
     const roomId = [senderId, receiverId].sort().join("_");
     socket.join(roomId);
   });
 
-  // Handle sending messages
-  socket.on("sendMessage", (data) => {
-    const roomId = [data.senderId, data.receiverId].sort().join("_");
-    io.to(roomId).emit("newMessage", data); // Broadcast to both users
+  socket.on("sendMessage", ({ receiverId, message }) => {
+    const senderId = socket.user.id;
+    const roomId = [senderId, receiverId].sort().join("_");
+
+    io.to(roomId).emit("newMessage", {
+      senderId,
+      receiverId,
+      message
+    });
   });
 
-  // Join Group Chat Room
-socket.on("joinGroupRoom", ({ groupId }) => {
-  socket.join(`group_${groupId}`);
-});
+  socket.on("joinGroupRoom", ({ groupId }) => {
+    socket.join(`group_${groupId}`);
+  });
 
-// Group message
-socket.on("sendGroupMessage", (data) => {
-  io.to(`group_${data.groupId}`).emit("newGroupMessage", data);
-});
-
-socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+  socket.on("sendGroupMessage", ({ groupId, message }) => {
+    io.to(`group_${groupId}`).emit("newGroupMessage", {
+      senderId: socket.user.id,
+      groupId,
+      message
+    });
   });
 });
 

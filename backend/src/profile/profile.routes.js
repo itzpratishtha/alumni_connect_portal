@@ -1,3 +1,5 @@
+// profile.routes.js
+
 import express from "express";
 import {
   getMyProfile,
@@ -6,22 +8,26 @@ import {
   updateMyProfile
 } from "./profile.controller.js";
 
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { authRequired } from "../middleware/authMiddleware.js";
 import { upload } from "../config/upload.js";
-import { updateProfile } from "../models/ProfileModel.js";
 
 const router = express.Router();
 
 // Get logged-in user's profile
-router.get("/me", verifyToken, getMyProfile);
+router.get("/me", authRequired, getMyProfile);
 
 // Create or Update profile
-router.put("/me", verifyToken, updateMyProfile);
+router.put("/me", authRequired, updateMyProfile);
 
-router.post("/upload-photo", verifyToken, upload.single("photo"), uploadPhoto);
+// Upload profile photo
+router.post(
+  "/upload-photo",
+  authRequired,
+  upload.single("photo"),
+  uploadPhoto
+);
 
-// ✅ Delete Photo
-router.delete("/delete-photo", verifyToken, deletePhoto);
-
+// Delete profile photo
+router.delete("/delete-photo", authRequired, deletePhoto);
 
 export default router;
