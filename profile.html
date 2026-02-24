@@ -119,8 +119,10 @@
 
       const profile = res.profile || res;
 
-      document.getElementById("name").value = profile.name || "";
-      document.getElementById("email").value = profile.email || "";
+      const authUser = JSON.parse(localStorage.getItem("user"));
+
+document.getElementById("name").value = authUser?.name || "";
+document.getElementById("email").value = authUser?.email || "";
       document.getElementById("batch").value = profile.batch || "";
       document.getElementById("domain").value = profile.domain || "";
       document.getElementById("company").value = profile.company || "";
@@ -128,8 +130,7 @@
       document.getElementById("linkedin").value = profile.linkedin || "";
       document.getElementById("github").value = profile.github || "";
 
-      // 🔥 keep localStorage in sync
-      localStorage.setItem("user", JSON.stringify(profile));
+      
 
     } catch (err) {
       console.error("LOAD PROFILE ERROR:", err);
@@ -164,11 +165,7 @@ if (deleteBtn) {
     };
 
     try {
-      const updatedUser = await apiCall("/api/profile/me", "PUT", data);
-
-      // 🔥 update local storage so UI reflects changes
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
+      await apiCall("/api/profile/me", "PUT", data);
       alert("Profile updated successfully!");
     } catch (err) {
       console.error("UPDATE PROFILE ERROR:", err);

@@ -4,7 +4,7 @@ import { createNewGroup, joinGroup, listGroups, sendGroupMessage, getGroupMessag
 
 const router = express.Router();
 
-router.post("/create", authRequired, createNewGroup);
+router.post("/", authRequired, createNewGroup);
 router.post("/join", authRequired, joinGroup);
 router.get("/", authRequired, listGroups);
 router.post("/message", authRequired, sendGroupMessage);

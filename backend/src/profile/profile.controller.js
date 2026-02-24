@@ -1,32 +1,50 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 import { createProfile, updateProfile, getProfileByUserId } from "../models/ProfileModel.js";
 
 export const getMyProfile = async (req, res) => {
   try {
     const profile = await getProfileByUserId(req.user.id);
-    return res.status(200).json({ success: true, profile: profile || {} });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+
+    if (!profile) {
+      return res.status(200).json({
+        user_id: req.user.id,
+        phone: "",
+        bio: "",
+        profile_image: "",
+        linkedin: "",
+        github: "",
+        batch: "",
+        domain: "",
+        company: "",
+        location: "",
+      });
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error("GET PROFILE ERROR:", err);
+    res.status(500).json({ message: "Failed to load profile" });
   }
 };
 
-export const createOrUpdateProfile = async (req, res) => {
+// PUT /api/profile/me
+export const updateMyProfile = async (req, res) => {
   try {
-    const profile = await getProfileByUserId(req.user.id);
+    const existingProfile = await getProfileByUserId(req.user.id);
 
-    if (!profile) {
+    if (!existingProfile) {
       await createProfile(req.user.id, req.body);
     } else {
       await updateProfile(req.user.id, req.body);
     }
 
-    // 🔥 ALWAYS return updated profile
+    // 🔥 RETURN UPDATED PROFILE (CRITICAL)
     const updatedProfile = await getProfileByUserId(req.user.id);
+    res.status(200).json(updatedProfile);
 
-    return res.status(200).json(updatedProfile);
-  } catch (error) {
-    console.error("PROFILE UPDATE ERROR:", error);
-    return res.status(500).json({ message: "Profile update failed" });
+  } catch (err) {
+    console.error("UPDATE PROFILE ERROR:", err);
+    res.status(500).json({ message: "Profile update failed" });
   }
 };
 
