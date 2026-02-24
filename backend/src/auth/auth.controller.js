@@ -143,3 +143,41 @@ export const login = async (req, res) => {
     });
   }
 };
+
+// ==============================
+// LOGOUT
+// ==============================
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("LOGOUT ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ==============================
+// GET CURRENT USER
+// ==============================
+export const me = async (req, res) => {
+  try {
+    const user = req.user;
+
+    res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      photo: user.photo || null,
+    });
+  } catch (err) {
+    console.error("ME ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
