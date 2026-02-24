@@ -46,27 +46,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"]
 }));
 
-io.use((socket, next) => {
-  try {
-    const cookieHeader = socket.handshake.headers.cookie;
-    if (!cookieHeader) return next(new Error("Not authenticated"));
 
-    const tokenCookie = cookieHeader
-      .split("; ")
-      .find(c => c.startsWith("token="));
-
-    if (!tokenCookie) return next(new Error("No token"));
-
-    const token = tokenCookie.split("=")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    socket.user = decoded; // { id, role }
-    next();
-
-  } catch (err) {
-    next(new Error("Authentication failed"));
-  }
-});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -103,6 +83,28 @@ io.on("connection", (socket) => {
       message
     });
   });
+
+  io.use((socket, next) => {
+  try {
+    const cookieHeader = socket.handshake.headers.cookie;
+    if (!cookieHeader) return next(new Error("Not authenticated"));
+
+    const tokenCookie = cookieHeader
+      .split("; ")
+      .find(c => c.startsWith("token="));
+
+    if (!tokenCookie) return next(new Error("No token"));
+
+    const token = tokenCookie.split("=")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    socket.user = decoded; // { id, role }
+    next();
+
+  } catch (err) {
+    next(new Error("Authentication failed"));
+  }
+});
 
   socket.on("joinGroupRoom", ({ groupId }) => {
     socket.join(`group_${groupId}`);
