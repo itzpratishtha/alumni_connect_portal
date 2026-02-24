@@ -1,7 +1,7 @@
 // resources.routes.js
 
 import express from "express";
-import { addResource, listResources } from "./resources.controller.js";
+import { addResource, listResources } from "./resource.controller.js";
 import { authRequired } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 
