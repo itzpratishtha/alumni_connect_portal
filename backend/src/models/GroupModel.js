@@ -1,4 +1,4 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 export const createGroup = async (name, description, userId) => {
   const [result] = await db.query(
@@ -34,4 +34,12 @@ export const getGroupMessagesModel = async (groupId) => {
     [groupId]
   );
   return rows;
+};
+
+export const isGroupMember = async (groupId, userId) => {
+  const [rows] = await pool.query(
+    "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? LIMIT 1",
+    [groupId, userId]
+  );
+  return rows.length > 0;
 };
