@@ -57,15 +57,38 @@ const __dirname = path.dirname(__filename);
 // Create server instance for socket.io
 const server = http.createServer(app);
 
-// Socket.io setup
+// Socket.io setup (FIRST create io)
 const io = new Server(server, {
   cors: {
-    origin: "*",   // later restrict to frontend domain
+    origin: "*", // you can restrict later
     methods: ["GET", "POST"]
   }
 });
+
+io.use((socket, next) => {
+  try {
+    const cookieHeader = socket.handshake.headers.cookie;
+    if (!cookieHeader) return next(new Error("Not authenticated"));
+
+    const tokenCookie = cookieHeader
+      .split("; ")
+      .find(c => c.startsWith("token="));
+
+    if (!tokenCookie) return next(new Error("No token"));
+
+    const token = tokenCookie.split("=")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    socket.user = decoded; // { id, role }
+    next();
+  } catch (err) {
+    next(new Error("Authentication failed"));
+  }
+});
+
+// Socket event handlers (AFTER io.use)
 io.on("connection", (socket) => {
-  console.log("Socket user connected:", socket.user.id);
+  console.log("Socket connected:", socket.user.id);
 
   socket.on("joinRoom", ({ receiverId }) => {
     const senderId = socket.user.id;
@@ -84,28 +107,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  io.use((socket, next) => {
-  try {
-    const cookieHeader = socket.handshake.headers.cookie;
-    if (!cookieHeader) return next(new Error("Not authenticated"));
-
-    const tokenCookie = cookieHeader
-      .split("; ")
-      .find(c => c.startsWith("token="));
-
-    if (!tokenCookie) return next(new Error("No token"));
-
-    const token = tokenCookie.split("=")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    socket.user = decoded; // { id, role }
-    next();
-
-  } catch (err) {
-    next(new Error("Authentication failed"));
-  }
-});
-
   socket.on("joinGroupRoom", ({ groupId }) => {
     socket.join(`group_${groupId}`);
   });
@@ -116,6 +117,10 @@ io.on("connection", (socket) => {
       groupId,
       message
     });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.user.id);
   });
 });
 
