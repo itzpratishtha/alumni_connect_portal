@@ -5,14 +5,6 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// Only students can search alumni
-router.get(
-  "/",
-  authRequired,
-  authorize("student"),
-  listAlumni
-);
-
 export const listAlumni = async (req, res) => {
   try {
     const filters = {
