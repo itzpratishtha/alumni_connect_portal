@@ -1,4 +1,4 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 export const sendMessageModel = async (senderId, receiverId, message) => {
   const [result] = await db.query(
@@ -17,4 +17,12 @@ export const getMessagesModel = async (user1, user2) => {
     [user1, user2, user2, user1]
   );
   return rows;
+};
+
+export const userExists = async (userId) => {
+  const [rows] = await pool.query(
+    "SELECT id FROM users WHERE id = ? LIMIT 1",
+    [userId]
+  );
+  return rows.length > 0;
 };
