@@ -1,9 +1,7 @@
-import express from "express";
-import { listAlumni } from "./alumni.controller.js";
-import { authRequired } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
 
-const router = express.Router();
+// alumni.controller.js
+
+import { getAlumni } from "../models/AlumniModel.js";
 
 export const listAlumni = async (req, res) => {
   try {
@@ -11,11 +9,10 @@ export const listAlumni = async (req, res) => {
       batch: req.query.batch || null,
       domain: req.query.domain || null,
       company: req.query.company || null,
-      location: req.query.location || null,
+      location: req.query.location || null
     };
 
     const alumni = await getAlumni(filters);
-
     res.status(200).json(alumni);
 
   } catch (error) {
@@ -23,5 +20,3 @@ export const listAlumni = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-export default router;
