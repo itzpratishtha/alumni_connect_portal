@@ -1,19 +1,19 @@
-
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // Get authenticated user from backend
-    const user = await apiCall("/api/auth/me");
+    const res = await fetch(API_BASE + "/api/auth/me", {
+      credentials: "include"
+    });
+    if (!res.ok) return;
+
+    const user = await res.json();
 
     document.querySelectorAll("[data-role]").forEach(el => {
-      const allowedRoles = el.dataset.role.split(",");
-      if (!allowedRoles.includes(user.role)) {
+      const allowed = el.dataset.role.split(",");
+      if (!allowed.includes(user.role)) {
         el.remove();
       }
     });
-
   } catch (err) {
-    // If not authenticated, do nothing
-    // protect.js will handle redirect
-    console.error("ROLE NAVBAR ERROR:", err);
+    console.error("Role navbar failed");
   }
 });

@@ -119,18 +119,19 @@
   <script src="logout.js"></script>
   <script src="mobileNav.js"></script>
 
-
-
-  <script>
+<script>
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       const user = await apiCall("/api/auth/me");
-      document.getElementById("userName").innerText = user?.name || "User";
-    } catch (err) {
-      // If not authenticated, fallback text (protect.js will redirect)
-      document.getElementById("userName").innerText = "User";
+      if (!user) return;
+
+      document.getElementById("userName").innerText = user.name;
+    } catch (e) {
+      console.error("User load failed");
     }
   });
-
 </script>
+
+</body>
+</html>
 
