@@ -4,17 +4,22 @@ import { findUserById } from "../models/UserModel.js";
 export const authRequired = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-
     if (!token) {
-       return res.status(401).json({ message: "Not authenticated" });
+      return res.status(401).json({ message: "Not authenticated" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
 
-   } catch (err) {
-      return res.status(401).json({ message: "Invalid token" });
+    // 🔥 FETCH FULL USER FROM DB
+    const user = await findUserById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    req.user = user; // ✅ full user object
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 

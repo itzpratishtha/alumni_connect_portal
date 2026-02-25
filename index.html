@@ -123,11 +123,11 @@
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       const user = await apiCall("/api/auth/me");
-      if (!user) return;
-
-      document.getElementById("userName").innerText = user.name;
-    } catch (e) {
-      console.error("User load failed");
+      if (user?.name) {
+        document.getElementById("userName").innerText = user.name;
+      }
+    } catch {
+      console.log("User not loaded");
     }
   });
 </script>

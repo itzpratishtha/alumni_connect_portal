@@ -5,21 +5,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const user = await apiCall("/api/auth/me");
 
-    // If not logged in, do nothing
     if (!user) return;
 
-    // Wrapper
+    // Clear old content (important after profile update)
+    navbarRight.innerHTML = "";
+
     const wrapper = document.createElement("div");
     wrapper.className = "profile-wrapper";
 
-    // Avatar
     const avatar = document.createElement("img");
     avatar.className = "profile-avatar";
-    avatar.src = user.photo
-      ? API_BASE + user.photo
-      : "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.name);
 
-    // Dropdown
+    avatar.src = user.photo
+      ? API_BASE + user.photo + "?t=" + Date.now() // 🔥 cache-bust
+      : "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(user.name || "User");
+
     const dropdown = document.createElement("div");
     dropdown.className = "profile-dropdown";
     dropdown.innerHTML = `
@@ -31,12 +32,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     wrapper.appendChild(dropdown);
     navbarRight.appendChild(wrapper);
 
-    // Toggle dropdown
     avatar.addEventListener("click", () => {
       dropdown.classList.toggle("show");
     });
 
-    // Logout (COOKIE-BASED)
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await apiCall("/api/auth/logout", "POST");
       sessionStorage.clear();
@@ -44,6 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
   } catch (err) {
-    console.error("Navbar user load failed", err);
+    console.error("Navbar load failed", err);
   }
 });
