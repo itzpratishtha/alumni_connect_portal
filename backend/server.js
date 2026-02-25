@@ -3,7 +3,6 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
-
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
@@ -23,6 +22,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import express from "express";
+
+console.log("EMAIL_PASS RAW:", process.env.EMAIL_PASS);
 
 const app = express();
 
