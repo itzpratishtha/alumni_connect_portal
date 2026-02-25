@@ -5,16 +5,17 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
+  port: Number(process.env.DB_PORT),
+
+  ssl: {
+    rejectUnauthorized: false, // ✅ REQUIRED FOR AIVEN
+  },
 
   waitForConnections: true,
   connectionLimit: 5,
-  queueLimit: 0,
   connectTimeout: 10000,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0
 });
 
-// 🔥 test connection on startup
 (async () => {
   try {
     const conn = await pool.getConnection();
