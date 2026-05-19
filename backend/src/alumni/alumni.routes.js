@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(
   "/",
   authRequired,
-  authorize("student"),
+  authorize("student","alumni","admin"),
   listAlumni
 );
 

@@ -59,9 +59,6 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const userId = await createUser(name, email, hashedPassword, role);
 
-    // ✅ Auto verify user
-    await markUserVerified(userId);
-
     return res.status(201).json({
       success: true,
       message: "Registered successfully. You can login now.",
@@ -151,8 +148,8 @@ export const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      secure: true,
     });
 
     res.status(200).json({ message: "Logged out successfully" });

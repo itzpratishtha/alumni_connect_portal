@@ -6,7 +6,7 @@ export const getAlumni = async (filters) => {
            profiles.batch, profiles.domain, profiles.company, profiles.location,
            profiles.linkedin, profiles.github
     FROM users
-    JOIN profiles ON users.id = profiles.user_id
+    LEFT JOIN profiles ON users.id = profiles.user_id
     WHERE users.role = 'alumni'
   `;
 

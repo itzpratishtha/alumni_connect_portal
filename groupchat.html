@@ -95,7 +95,10 @@
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 
   <script>
-    const socket = io("https://alumni-connect-portal-w0fm.onrender.com");
+    const socket = io("https://alumni-connect-portal-w0fm.onrender.com", {
+      withCredentials: true,
+      transports: ["websocket"]
+    });
 
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
@@ -103,7 +106,7 @@
 
     const params = new URLSearchParams(window.location.search);
     const groupId = params.get("groupId");
-    const userId = localStorage.getItem("userId");
+    const userId = await apiCall("/api/auth/me");;
 
     if (!groupId) {
       chatBox.innerHTML = "<p>No group selected.</p>";
@@ -117,7 +120,7 @@
     async function loadGroupMessages() {
       chatBox.innerHTML = "<p>Loading messages...</p>";
 
-      const res = await apiCall(`/api/groups/messages/${groupId}`, "GET", null, true);
+      const res = await apiCall(`/api/groups/${groupId}/messages`, "GET", null, true);
       chatBox.innerHTML = "";
 
       if (!res || res.length === 0) {
@@ -163,7 +166,7 @@
 
       // Save to DB
       await apiCall(
-        "/api/groups/messages/send",
+        "/api/groups/message",
         "POST",
         { groupId, message },
         true

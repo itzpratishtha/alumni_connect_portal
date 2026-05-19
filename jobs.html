@@ -88,7 +88,7 @@
 
 
   <script>
-    const role = localStorage.getItem("role");
+    const role = await apiCall("/api/auth/me");;
     const jobList = document.getElementById("jobList");
     const jobForm = document.getElementById("jobForm");
 

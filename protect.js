@@ -1,15 +1,19 @@
-// protect.js — backend-driven route protection (UX only)
+// protect.js
 
-(function () {
+(async function () {
   const publicPages = ["login.html", "register.html"];
   const currentPage = window.location.pathname.split("/").pop();
 
-  // Allow public pages
   if (publicPages.includes(currentPage)) return;
 
-  // Verify authentication via backend
-  apiCall("/api/auth/me")
-    .catch(() => {
-      window.location.href = "login.html";
-    });
+  try {
+    document.body.style.visibility = "hidden";
+
+    await apiCall("/api/auth/me");
+
+    document.body.style.visibility = "visible";
+
+  } catch (err) {
+    window.location.replace("login.html");
+  }
 })();

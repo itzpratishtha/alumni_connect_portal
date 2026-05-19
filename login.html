@@ -54,10 +54,8 @@
       });
 
       alert(res.message || "Login successful");
-
-      // ❌ No localStorage
-      // ❌ No token handling
-      // ✅ Cookie is already set by backend
+      localStorage.setItem("userId", res.user.id);
+      localStorage.setItem("role", res.user.role);
 
       window.location.href = "index.html";
 

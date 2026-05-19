@@ -117,6 +117,14 @@
       });
     }
 
+    document.addEventListener("DOMContentLoaded", async () => {
+    const user = await apiCall("/api/auth/me");
+
+    if (user.role !== "alumni" && user.role !== "admin") {
+     document.querySelector("#groupForm").parentElement.style.display = "none";
+    }
+  });
+
     // Create group
     groupForm.addEventListener("submit", async (e) => {
       e.preventDefault();

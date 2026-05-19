@@ -93,7 +93,10 @@
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 
   <script>
-    const socket = io("https://alumni-connect-portal-w0fm.onrender.com");
+    const socket = io("https://alumni-connect-portal-w0fm.onrender.com", {
+      withCredentials: true,
+      transports: ["websocket"]
+    });
 
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
@@ -159,7 +162,7 @@
 
       // Save to DB
       await apiCall(
-        "/api/messages/send",
+        "/api/messages",
         "POST",
         { receiverId, message },
         true

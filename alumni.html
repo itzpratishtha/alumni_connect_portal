@@ -97,16 +97,24 @@
       resultsDiv.innerHTML = "<p>Loading alumni...</p>";
 
       const query = new URLSearchParams(filters).toString();
-      const res = await apiCall(`/api/alumni?${query}`, "GET", null, true);
+      let res;
+      try {
+        res = await apiCall(`/api/alumni?${query}`);
+      } catch (err) {
+      resultsDiv.innerHTML = `<p>${err.message}</p>`;
+      return;
+      }
 
       resultsDiv.innerHTML = "";
 
-      if (!res || res.length === 0) {
-        resultsDiv.innerHTML = "<p>No alumni found.</p>";
-        return;
+      const alumni = res.alumni || res;
+
+      if (!alumni || alumni.length === 0){
+         resultsDiv.innerHTML = "<p>No alumni found.</p>";
+         return;
       }
 
-      res.forEach(a => {
+      alumni.forEach(a => {
         resultsDiv.innerHTML += `
           <div class="card">
             <h3>${a.name}</h3>

@@ -159,10 +159,18 @@
       batch: document.getElementById("batch").value.trim(),
       domain: document.getElementById("domain").value.trim(),
       company: document.getElementById("company").value.trim(),
-      location: document.getElementById("location").value.trim(),
       linkedin: document.getElementById("linkedin").value.trim(),
+      location: document.getElementById("location").value.trim(),
       github: document.getElementById("github").value.trim(),
     };
+
+if (
+  linkedin &&
+  !/^https:\/\/(www\.)?linkedin\.com\/.*$/i.test(linkedin)
+) {
+  alert("Enter valid LinkedIn URL");
+  return;
+}
 
     try {
       await apiCall("/api/profile/me", "PUT", data);
