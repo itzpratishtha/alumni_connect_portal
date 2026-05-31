@@ -1,9 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import { sendOTPEmail } from "../utils/sendOTPEmail.js";
 import {
   createUser,
+  saveOTP,
   findUserByEmail,
+  verifyUserOTP,
   markUserVerified,
 } from "../models/UserModel.js";
 
@@ -55,6 +57,11 @@ export const register = async (req, res) => {
       });
     }
 
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    await saveOTP(userId, otp, expires);
+
     // Create user
     const hashedPassword = await bcrypt.hash(password, 10);
     const userId = await createUser(name, email, hashedPassword, role);
@@ -91,6 +98,13 @@ export const login = async (req, res) => {
     }
 
     const user = await findUserByEmail(email);
+
+    if (!user.is_verified) {
+      return res.status(403).json({
+      success: false,
+      message: "Please verify your email first"
+    });
+  }
 
     if (!user) {
       return res.status(401).json({
@@ -156,6 +170,43 @@ export const logout = async (req, res) => {
   } catch (err) {
     console.error("LOGOUT ERROR:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await verifyUserOTP(email, otp);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP"
+      });
+    }
+
+    if (new Date(user.otp_expires) < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired"
+      });
+    }
+
+    await markUserVerified(user.id);
+
+    res.json({
+      success: true,
+      message: "Email verified successfully"
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 };
 
