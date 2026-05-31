@@ -57,14 +57,17 @@ export const register = async (req, res) => {
       });
     }
 
+    // Create user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userId = await createUser(name, email, hashedPassword, role);
+
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     await saveOTP(userId, otp, expires);
 
-    // Create user
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = await createUser(name, email, hashedPassword, role);
+    // Send Email
+    await sendOTPEmail(email, otp);
 
     return res.status(201).json({
       success: true,
@@ -78,6 +81,7 @@ export const register = async (req, res) => {
       message: "Server error",
     });
   }
+
 };
 
 // =====================================================
