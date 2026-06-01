@@ -98,9 +98,6 @@
       transports: ["websocket"]
     });
 
-    const receiver = await apiCall(
-    `/api/users/${receiverId}`
-  );
 
     document.getElementById("chatTitle")
       .textContent =
@@ -114,9 +111,30 @@
     const receiverId = params.get("to");
     let senderId;
 
+    const receiver = await apiCall(
+    `/api/users/${receiverId}`
+  );
+
+  const profile = await apiCall(
+  `/api/profile/${receiverId}`
+);
+
+document.getElementById("chatTitle")
+  .textContent =
+  `Chat with ${profile.name}`;
+
 async function initUser() {
+
   const user = await apiCall("/api/auth/me");
   senderId = user.id;
+
+  const profile = await apiCall(
+    `/api/profile/${receiverId}`
+  );
+
+  document.getElementById("chatTitle")
+    .textContent =
+    `Chat with ${profile.name}`;
 
   socket.emit("joinRoom", {
     senderId: Number(senderId),
@@ -132,12 +150,6 @@ initUser();
       chatBox.innerHTML = "<p>No conversation selected.</p>";
       chatForm.style.display = "none";
     }
-
-    // Join private room
-    socket.emit("joinRoom", {
-      senderId: Number(senderId),
-      receiverId: Number(receiverId)
-    });
 
     // Load previous messages
     async function loadMessages() {
@@ -192,6 +204,11 @@ initUser();
         { receiverId, message },
         true
       );
+      if (chatBox.innerHTML.includes("No messages yet")) {
+      chatBox.innerHTML = "";
+      }
+      appendMessage(message, true);
+      messageInput.value = "";
     });
 
   </script>
