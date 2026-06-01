@@ -17,6 +17,33 @@ export const updateProfile = async (userId, data) => {
 };
 
 export const getProfileByUserId = async (userId) => {
-  const [rows] = await db.query("SELECT * FROM profiles WHERE user_id=?", [userId]);
+  const [rows] = await db.query(
+    `
+    SELECT
+      u.id,
+      u.name,
+      u.email,
+      u.role,
+      u.photo,
+
+      p.phone,
+      p.bio,
+      p.profile_image,
+      p.linkedin,
+      p.github,
+      p.batch,
+      p.domain,
+      p.company,
+      p.location
+
+    FROM users u
+    LEFT JOIN profiles p
+      ON u.id = p.user_id
+
+    WHERE u.id = ?
+    `,
+    [userId]
+  );
+
   return rows[0];
 };

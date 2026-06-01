@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Alumni Profile | PIET Alumni Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/modern.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-container">
+
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+    <div class="nav-brand">
+      <img src="alumni.png" alt="PIET Logo">
+      <span>
+        PIET Alumni Connect<br>
+        <small>Alumni Society</small>
+      </span>
+    </div>
+
+    <div class="nav-links" id="navbarLinks">
+      <a href="index.html">Home</a>
+      <a href="alumni.html" data-role="student">Find Alumni</a>
+      <a href="jobs.html" data-role="student">Jobs</a>
+      <a href="groups.html" data-role="student,alumni">Groups</a>
+      <a href="resources.html" data-role="student,alumni">Resources</a>
+      <a href="messages.html" data-role="student,alumni">Messages</a>
+    </div>
+
+    <div class="nav-user" id="navUser"></div>
+
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="container">
+
+  <!-- PROFILE CARD -->
+  <section class="card" id="profileCard" style="margin-top:30px;">
+
+    <div style="text-align:center;">
+
+      <img
+        id="profilePhoto"
+        src="default-avatar.png"
+        alt="Profile"
+        style="
+          width:140px;
+          height:140px;
+          border-radius:50%;
+          object-fit:cover;
+          margin-bottom:15px;
+        "
+      >
+
+      <h2 id="name">Loading...</h2>
+
+      <p
+        id="email"
+        style="color:#6b7280;"
+      >
+      </p>
+
+    </div>
+
+    <hr style="margin:25px 0;">
+
+    <div
+      style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+        gap:20px;
+      "
+    >
+
+      <div>
+        <strong>Batch</strong>
+        <p id="batch">-</p>
+      </div>
+
+      <div>
+        <strong>Domain</strong>
+        <p id="domain">-</p>
+      </div>
+
+      <div>
+        <strong>Company</strong>
+        <p id="company">-</p>
+      </div>
+
+      <div>
+        <strong>Location</strong>
+        <p id="location">-</p>
+      </div>
+
+    </div>
+
+    <hr style="margin:25px 0;">
+
+    <div>
+
+      <h3>Bio</h3>
+
+      <p
+        id="bio"
+        style="
+          margin-top:10px;
+          line-height:1.6;
+        "
+      >
+        No bio available.
+      </p>
+
+    </div>
+
+    <hr style="margin:25px 0;">
+
+    <div
+      style="
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+      "
+    >
+
+      <a
+        id="linkedin"
+        class="btn"
+        target="_blank"
+        style="display:none;"
+      >
+        LinkedIn
+      </a>
+
+      <a
+        id="github"
+        class="btn"
+        target="_blank"
+        style="display:none;"
+      >
+        GitHub
+      </a>
+
+      <a
+        id="messageBtn"
+        class="btn"
+      >
+        Message Alumni
+      </a>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  © 2025 PIET Alumni Connect
+</footer>
+
+<script src="api.js"></script>
+<script src="protect.js"></script>
+<script src="roleNavbar.js"></script>
+<script src="logout.js"></script>
+<script src="navbarUser.js"></script>
+<script src="mobileNav.js"></script>
+
+<script>
+
+async function loadAlumniProfile() {
+
+  try {
+
+    const alumniId =
+      new URLSearchParams(window.location.search)
+        .get("id");
+
+    if (!alumniId) {
+      alert("Invalid alumni profile");
+      return;
+    }
+
+    const profile =
+      await apiCall(`/api/profile/${alumniId}`);
+
+    document.getElementById("name").textContent =
+      profile.name || "Unknown User";
+
+    document.getElementById("email").textContent =
+      profile.email || "";
+
+    document.getElementById("batch").textContent =
+      profile.batch || "-";
+
+    document.getElementById("domain").textContent =
+      profile.domain || "-";
+
+    document.getElementById("company").textContent =
+      profile.company || "-";
+
+    document.getElementById("location").textContent =
+      profile.location || "-";
+
+    document.getElementById("bio").textContent =
+      profile.bio || "No bio available.";
+
+    if (profile.photo) {
+      document.getElementById("profilePhoto").src =
+        profile.photo;
+    }
+
+    if (profile.linkedin) {
+
+      const linkedin =
+        document.getElementById("linkedin");
+
+      linkedin.href = profile.linkedin;
+      linkedin.style.display = "inline-block";
+    }
+
+    if (profile.github) {
+
+      const github =
+        document.getElementById("github");
+
+      github.href = profile.github;
+      github.style.display = "inline-block";
+    }
+
+    document.getElementById("messageBtn").href =
+      `messages.html?to=${profile.id}`;
+
+  }
+  catch(err) {
+
+    console.error(err);
+
+    document.getElementById("profileCard").innerHTML = `
+      <h2>Unable to load profile</h2>
+      <p>${err.message}</p>
+    `;
+  }
+}
+
+loadAlumniProfile();
+
+</script>
+
+</body>
+</html>

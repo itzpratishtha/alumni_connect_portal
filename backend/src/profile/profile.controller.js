@@ -110,3 +110,24 @@ export const deletePhoto = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const getProfileById = async (req, res) => {
+  try {
+    const profile = await getProfileByUserId(req.params.id);
+
+    if (!profile) {
+      return res.status(404).json({
+        message: "Profile not found"
+      });
+    }
+
+    res.json(profile);
+
+  } catch (err) {
+    console.error("GET PROFILE BY ID ERROR:", err);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+};

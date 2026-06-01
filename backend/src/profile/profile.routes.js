@@ -10,11 +10,14 @@ import {
 
 import { authRequired } from "../middleware/authMiddleware.js";
 import { upload } from "../config/upload.js";
+import { getProfileById } from "./profile.controller.js";
 
 const router = express.Router();
 
 // Get logged-in user's profile
 router.get("/me", authRequired, getMyProfile);
+
+router.get("/:id", authRequired, getProfileById);
 
 // Create or Update profile
 router.put("/me", authRequired, updateMyProfile);

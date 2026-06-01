@@ -64,10 +64,11 @@ export const register = async (req, res) => {
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
-    await saveOTP(userId, otp, expires);
 
-    // Send Email
-    await sendOTPEmail(email, otp);
+    // await saveOTP(userId, otp, expires);
+    // await sendOTPEmail(email, otp);
+
+    await markUserVerified(userId);
 
     return res.status(201).json({
       success: true,
