@@ -106,6 +106,16 @@
     const receiverId = params.get("to");
     let senderId;
 
+    if (!receiverId) {
+  document.getElementById("chatTitle")
+    .textContent = "No conversation selected";
+
+  chatBox.innerHTML =
+    "<p>Select an alumni to start chatting.</p>";
+
+  chatForm.style.display = "none";
+}
+
 async function initUser() {
 
   const user = await apiCall("/api/auth/me");
@@ -126,8 +136,23 @@ async function initUser() {
 
   loadMessages();
 }
+if (!receiverId) {
 
-initUser();
+  document.getElementById("chatTitle")
+    .textContent = "Messages";
+
+  chatBox.innerHTML = `
+    <p>
+      Select an alumni from the Alumni page
+      to start chatting.
+    </p>
+  `;
+
+  chatForm.style.display = "none";
+
+} else {
+  initUser();
+}
 
     if (!receiverId) {
       chatBox.innerHTML = "<p>No conversation selected.</p>";
