@@ -98,11 +98,6 @@
       transports: ["websocket"]
     });
 
-
-    document.getElementById("chatTitle")
-      .textContent =
-      `Chat with ${receiver.name}`;
-
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
     const messageInput = document.getElementById("messageInput");
@@ -110,10 +105,6 @@
     const params = new URLSearchParams(window.location.search);
     const receiverId = params.get("to");
     let senderId;
-
-    const receiver = await apiCall(
-    `/api/users/${receiverId}`
-  );
 
 async function initUser() {
 
@@ -151,12 +142,9 @@ initUser();
       chatBox.innerHTML = "";
 
       if (!res || res.length === 0) {
-        chatBox.innerHTML = "<p>No messages yet.</p>";
-        if (chatBox.innerHTML.includes("No messages yet")) {
-        chatBox.innerHTML = "";
-        }
-        return;
-      }
+      chatBox.innerHTML = "<p>No messages yet.</p>";
+      return;
+    }
 
       res.forEach(msg => {
         const isMe = msg.sender_id == senderId;
