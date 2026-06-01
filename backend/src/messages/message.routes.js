@@ -9,4 +9,5 @@ const router = express.Router();
 router.post("/", authRequired, sendMessage);
 router.get("/:userId", authRequired, getMessages);
 
+
 export default router;

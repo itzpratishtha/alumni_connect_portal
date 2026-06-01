@@ -48,7 +48,7 @@
 
     <!-- HEADER -->
     <section class="card" style="margin-top:30px;">
-      <h2>Messages</h2>
+      <h2 id="chatTitle">Messages</h2>
       <p style="margin-top:6px; color:#6b7280;">
         Private 1-to-1 conversation
       </p>
@@ -89,7 +89,6 @@
   <script src="mobileNav.js"></script>
 
 
-
   <!-- Socket.io -->
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 
@@ -99,13 +98,35 @@
       transports: ["websocket"]
     });
 
+    const receiver = await apiCall(
+    `/api/users/${receiverId}`
+  );
+
+    document.getElementById("chatTitle")
+      .textContent =
+      `Chat with ${receiver.name}`;
+
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
     const messageInput = document.getElementById("messageInput");
 
     const params = new URLSearchParams(window.location.search);
     const receiverId = params.get("to");
-    const senderId = localStorage.getItem("userId");
+    let senderId;
+
+async function initUser() {
+  const user = await apiCall("/api/auth/me");
+  senderId = user.id;
+
+  socket.emit("joinRoom", {
+    senderId: Number(senderId),
+    receiverId: Number(receiverId)
+  });
+
+  loadMessages();
+}
+
+initUser();
 
     if (!receiverId) {
       chatBox.innerHTML = "<p>No conversation selected.</p>";
@@ -127,12 +148,15 @@
 
       if (!res || res.length === 0) {
         chatBox.innerHTML = "<p>No messages yet.</p>";
+        if (chatBox.innerHTML.includes("No messages yet")) {
+        chatBox.innerHTML = "";
+        }
         return;
       }
 
       res.forEach(msg => {
         const isMe = msg.sender_id == senderId;
-        appendMessage(msg.message, isMe);
+        appendMessage(msg.message_text, isMe);
       });
 
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -168,19 +192,8 @@
         { receiverId, message },
         true
       );
-
-      // Emit socket event
-      socket.emit("sendMessage", {
-        senderId: Number(senderId),
-        receiverId: Number(receiverId),
-        message
-      });
-
-      appendMessage(message, true);
-      messageInput.value = "";
     });
 
-    loadMessages();
   </script>
 
 </body>
