@@ -115,14 +115,6 @@
     `/api/users/${receiverId}`
   );
 
-  const profile = await apiCall(
-  `/api/profile/${receiverId}`
-);
-
-document.getElementById("chatTitle")
-  .textContent =
-  `Chat with ${profile.name}`;
-
 async function initUser() {
 
   const user = await apiCall("/api/auth/me");
