@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendOTPEmail(email, otp) {
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: process.env.BREVO_USER,
     to: email,
     subject: "Verify Your Email - PIET Alumni Connect",
     html: `
