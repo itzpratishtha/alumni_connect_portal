@@ -11,6 +11,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendOTPEmail(email, otp) {
+  await transporter.verify();
+  console.log("BREVO SMTP READY");
   await transporter.sendMail({
     from: process.env.BREVO_USER,
     to: email,

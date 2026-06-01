@@ -24,6 +24,8 @@ import { fileURLToPath } from "url";
 import express from "express";
 
 console.log("BREVO_PASS RAW:", process.env.BREVO_PASS);
+console.log("BREVO_USER:", process.env.BREVO_USER);
+console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
 
 const app = express();
 
