@@ -23,7 +23,7 @@ import { fileURLToPath } from "url";
 
 import express from "express";
 
-console.log("EMAIL_PASS RAW:", process.env.EMAIL_PASS);
+console.log("BREVO_PASS RAW:", process.env.EMAIL_PASS);
 
 const app = express();
 
@@ -146,7 +146,7 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 
-console.log("EMAIL ENV CHECK:", process.env.EMAIL_USER, process.env.EMAIL_PASS ? "PASS_OK" : "PASS_MISSING");
+console.log("BREVO ENV CHECK:", process.env.BREVO_USER, process.env.BREVO_PASS ? "PASS_OK" : "PASS_MISSING");
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
