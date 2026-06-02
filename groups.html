@@ -110,11 +110,12 @@
             </p>
 
             <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-              <a href="group_members.html?groupId=${g.id}" class="btn">View Members</a>
-              <a href="groupchat.html?groupId=${g.id}" class="btn">Open Chat</a>
+             <button class="btn join-btn" onclick="joinGroup(${g.id})"> Join Group </button>
+             <a href="groupchat.html?groupId=${g.id}" class="btn"> Open Chat </a>
+            <a href="group_members.html?groupId=${g.id}" class="btn"> Members </a>
             </div>
-          </div>
-        `;
+            </div>
+            `;
       });
     }
 
@@ -144,6 +145,29 @@
         alert(err.message || "Failed to create group");
       }
     });
+
+    //Join group
+    async function joinGroup(groupId) {
+  try {
+
+    await apiCall(
+      "/api/groups/join",
+      "POST",
+      { groupId },
+      true
+    );
+
+    alert("Joined group successfully");
+
+  } catch(err) {
+
+    alert(
+      err.message ||
+      "Failed to join group"
+    );
+
+  }
+}
 
     // Initial load
     loadGroups();

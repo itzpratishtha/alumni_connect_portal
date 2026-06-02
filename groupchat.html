@@ -56,6 +56,10 @@
       </p>
     </section>
 
+    <div style="margin-bottom:15px;">
+    <a href="groups.html" class="btn"> ← Back to Groups </a>
+    </div>
+
     <!-- CHAT -->
     <section class="card" style="margin-top:20px;">
 
@@ -107,7 +111,15 @@
 
     const params = new URLSearchParams(window.location.search);
     const groupId = params.get("groupId");
-    const userId = await apiCall("/api/auth/me");;
+    
+let userId;
+async function init() {
+  const user = await apiCall("/api/auth/me");
+  userId = user.id;
+  loadGroupMessages();
+}
+
+init();
 
     if (!groupId) {
       chatBox.innerHTML = "<p>No group selected.</p>";
@@ -130,7 +142,7 @@
       }
 
       res.forEach(msg => {
-        appendMessage(msg.message, msg.sender_id == userId, msg.sender_name);
+        appendMessage(msg.message_text, msg.sender_id == userId, msg.sender_name);
       });
 
       chatBox.scrollTop = chatBox.scrollHeight;

@@ -127,3 +127,16 @@ export const getGroupMessages = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const listGroupMembers = async (
+  req,
+  res
+) => {
+
+  const members =
+    await getGroupMembers(
+      req.params.groupId
+    );
+
+  res.json(members);
+};

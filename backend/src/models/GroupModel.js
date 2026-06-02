@@ -54,3 +54,26 @@ export const isGroupMember = async (groupId, userId) => {
 
   return rows.length > 0;
 };
+
+export const getGroupMembers = async (groupId) => {
+
+  const [rows] = await pool.query(
+    `
+    SELECT
+      u.id,
+      u.name,
+      u.role,
+      p.domain,
+      p.company
+    FROM group_members gm
+    JOIN users u
+      ON gm.user_id = u.id
+    LEFT JOIN profiles p
+      ON p.user_id = u.id
+    WHERE gm.group_id=?
+    `,
+    [groupId]
+  );
+
+  return rows;
+};

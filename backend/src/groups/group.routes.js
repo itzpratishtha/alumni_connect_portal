@@ -20,5 +20,10 @@ router.post("/join", authRequired, joinGroup);
 router.get("/", authRequired, listGroups);
 router.post("/message", authRequired, sendGroupMessage);
 router.get("/:groupId/messages", authRequired, getGroupMessages);
+router.get(
+  "/members/:groupId",
+  authRequired,
+  listGroupMembers
+);
 
 export default router;
