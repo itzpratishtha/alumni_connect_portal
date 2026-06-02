@@ -4,7 +4,8 @@ import {
   joinGroup,
   listGroups,
   sendGroupMessage,
-  getGroupMessages
+  getGroupMessages,
+  listGroupMembers
 } from "./group.controller.js";
 
 import { authRequired } from "../middleware/authMiddleware.js";
