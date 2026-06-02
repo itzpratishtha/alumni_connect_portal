@@ -6,7 +6,8 @@ import {
   getAllGroups,
   sendGroupMessageModel,
   getGroupMessagesModel,
-  isGroupMember
+  isGroupMember,
+  getGroupMembers
 } from "../models/GroupModel.js";
 
 // ==============================
@@ -128,15 +129,32 @@ export const getGroupMessages = async (req, res) => {
   }
 };
 
+// list group members 
 export const listGroupMembers = async (
   req,
   res
 ) => {
 
-  const members =
-    await getGroupMembers(
-      req.params.groupId
+  try {
+
+    const members =
+      await getGroupMembers(
+        req.params.groupId
+      );
+
+    res.json(members);
+
+  } catch(error) {
+
+    console.error(
+      "GROUP MEMBERS ERROR:",
+      error
     );
 
-  res.json(members);
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
 };
