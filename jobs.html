@@ -63,6 +63,8 @@
         <input type="text" id="company" placeholder="Company Name" required>
         <input type="text" id="location" placeholder="Location">
         <textarea id="description" placeholder="Job Description" required></textarea>
+        <input type="text" id="jobType" placeholder="Job Type"/>
+        <input type="url" id="applyLink" placeholder="Apply Link"/>
 
         <button type="submit" class="btn">Post Job</button>
       </form>
@@ -89,7 +91,18 @@
 
 
   <script>
-    const role = await apiCall("/api/auth/me");;
+    let currentUser;
+
+async function init() {
+
+  currentUser = await apiCall(
+    "/api/auth/me"
+  );
+
+  loadJobs();
+}
+
+init();
     const jobList = document.getElementById("jobList");
     const jobForm = document.getElementById("jobForm");
 
@@ -132,7 +145,9 @@
           title: document.getElementById("title").value,
           company: document.getElementById("company").value,
           location: document.getElementById("location").value,
-          description: document.getElementById("description").value
+          description: document.getElementById("description").value,
+          job_type: document.getElementById("jobType").value,
+          apply_link: document.getElementById("applyLink").value
         };
 
         try {
@@ -146,8 +161,7 @@
       });
     }
 
-    // Initial load
-    loadJobs();
+
   </script>
 
 </body>
