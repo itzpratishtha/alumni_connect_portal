@@ -42,6 +42,7 @@ export const getMyProfile = async (req, res) => {
 // ==============================
 export const updateMyProfile = async (req, res) => {
   try {
+    console.log("PROFILE UPDATE BODY:", req.body);
     const existingProfile = await getProfileByUserId(req.user.id);
 
     if (!existingProfile) {
