@@ -13,9 +13,9 @@ export const getAlumni = async (filters) => {
   const params = [];
 
   if (filters.batch) {
-    query += " AND profiles.batch = ?";
-    params.push(filters.batch);
-  }
+  query += " AND profiles.batch LIKE ?";
+  params.push(`%${filters.batch}%`);
+}
 
   if (filters.domain) {
     query += " AND profiles.domain LIKE ?";
