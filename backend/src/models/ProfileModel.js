@@ -16,6 +16,16 @@ export const updateProfile = async (userId, data) => {
   );
 };
 
+export const profileExists = async (userId) => {
+  const [rows] = await db.query(
+    "SELECT user_id FROM profiles WHERE user_id=?",
+    [userId]
+  );
+
+  return rows.length > 0;
+};
+
+
 export const getProfileByUserId = async (userId) => {
   const [rows] = await db.query(
     `

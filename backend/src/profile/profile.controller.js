@@ -4,7 +4,8 @@ import pool from "../config/db.js";
 import {
   createProfile,
   updateProfile,
-  getProfileByUserId
+  getProfileByUserId,
+  profileExists
 } from "../models/ProfileModel.js";
 
 // ==============================
@@ -43,14 +44,23 @@ export const getMyProfile = async (req, res) => {
 export const updateMyProfile = async (req, res) => {
   try {
     console.log("PROFILE UPDATE BODY:", req.body);
-    const existingProfile = await getProfileByUserId(req.user.id);
+    const exists =
+  await profileExists(req.user.id);
 
-    if (!existingProfile) {
-      await createProfile(req.user.id, req.body);
-    } else {
-      await updateProfile(req.user.id, req.body);
-    }
+if (!exists) {
 
+  await createProfile(
+    req.user.id,
+    req.body
+  );
+
+} else {
+
+  await updateProfile(
+    req.user.id,
+    req.body
+  );
+}
     const updatedProfile = await getProfileByUserId(req.user.id);
     res.status(200).json(updatedProfile);
 
