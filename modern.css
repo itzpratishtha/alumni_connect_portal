@@ -625,6 +625,91 @@ select:focus {
     }
 
 }
+@media(max-width:768px){
+
+  #conversationList{
+      width:100% !important;
+      min-width:100% !important;
+      max-width:100% !important;
+  }
+
+}
+@media(max-width:425px){
+
+  .chat-header{
+      padding:10px;
+      gap:10px;
+  }
+
+  .chat-avatar{
+      width:40px;
+      height:40px;
+      font-size:18px;
+  }
+
+  #chatTitle{
+      font-size:16px;
+  }
+
+}
+@media(max-width:425px){
+
+  #chatForm{
+      padding:8px;
+      gap:6px;
+  }
+
+  #messageInput{
+      min-width:0;
+      font-size:14px;
+  }
+
+  .send-btn{
+      min-width:70px;
+      padding:8px 10px;
+      font-size:14px;
+  }
+
+}
+@media(max-width:425px){
+
+  .chat-message{
+      max-width:85%;
+      font-size:14px;
+      padding:10px 12px;
+  }
+
+}
+@media(max-width:425px){
+
+  #backBtn{
+      display:block !important;
+      margin-right:5px;
+      padding:5px;
+      font-size:22px;
+      flex-shrink:0;
+  }
+
+}
+@media(max-width:768px){
+
+  .messages-layout{
+      display:block !important;
+      height:auto !important;
+  }
+
+  #conversationList{
+      width:100% !important;
+      min-width:100% !important;
+      max-width:100% !important;
+      border-right:none;
+  }
+
+  .chat-panel{
+      width:100% !important;
+  }
+
+}
 
 /* =========================
    FOOTER
