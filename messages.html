@@ -121,12 +121,6 @@
 
 </main>
 
-
-  <!-- FOOTER -->
-  <footer>
-    © 2025 PIET Alumni Connect
-  </footer>
-
   <!-- JS -->
   <script src="api.js"></script>
   <script src="protect.js"></script>
@@ -163,11 +157,6 @@
     loadConversations();
 }
   init();
-
-    if (!receiverId) {
-      chatBox.innerHTML = "<p>No conversation selected.</p>";
-      chatForm.style.display = "none";
-    }
 
     // Load previous messages
     async function loadMessages() {
@@ -233,11 +222,16 @@
     );
 
   const list =
-    document.getElementById(
-      "conversationList"
-    );
+  document.getElementById(
+    "conversationList"
+  );
 
-  list.innerHTML = "";
+const searchBox =
+  list.querySelector(".conversation-search");
+
+list.innerHTML = "";
+
+list.appendChild(searchBox);
 
   users.forEach(user => {
     list.innerHTML += `
@@ -294,7 +288,6 @@ document.getElementById("chatStatus")
 });
   loadMessages();
 }
-init();
   </script>
 
 </body>

@@ -428,6 +428,7 @@ select:focus {
 ========================== */
 
 .messages-layout{
+  width: 100%;
   display:flex;
   flex-direction: row;
   height:78vh;
