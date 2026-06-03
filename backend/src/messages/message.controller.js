@@ -4,8 +4,7 @@ import {
   sendMessageModel,
   getMessagesModel,
   userExists,
-  getConversations,
-  findUserById
+  getConversations
 } from "../models/MessageModel.js";
 
 // ==============================
@@ -68,18 +67,6 @@ export const getMessages = async (req, res) => {
     console.error("GET MESSAGES ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
-};
-
-export const getUserById = async (req, res) => {
-  const user = await findUserById(req.params.id);
-
-  if (!user) {
-    return res.status(404).json({
-      message: "User not found"
-    });
-  }
-
-  res.json(user);
 };
 
 export const getConversationList = async (
