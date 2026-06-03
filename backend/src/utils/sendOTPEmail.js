@@ -7,7 +7,7 @@ export async function sendOTPEmail(email, otp) {
     {
       sender: {
         name: "PIET Alumni Connect",
-        email: "yourverifiedemail@example.com"
+        email: "pratishthasomani19@gmail.com"
       },
 
       to: [
