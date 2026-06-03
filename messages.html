@@ -45,22 +45,20 @@
 
   <!-- MAIN -->
   <main class="container">
+    <div class="messages-layout">
 
-    <!-- HEADER -->
-    <section class="card" style="margin-top:30px;">
-      <h2 id="chatTitle">Messages</h2>
-      <p style="margin-top:6px; color:#6b7280;">
-        Private 1-to-1 conversation
-      </p>
-    </section>
+  <div id="conversationList">
+  </div>
 
-    <!-- CHAT CARD -->
-    <section class="card" style="margin-top:20px;">
+  <div class="chat-panel">
 
-      <!-- Messages box -->
-      <div id="chatBox" class="chat-box"></div>
+    <h2 id="chatTitle">
+      Select a conversation
+    </h2>
 
-      <!-- Input -->
+    <div id="chatBox"></div>
+
+    <form id="chatForm">
       <form id="chatForm" style="margin-top:14px; display:flex; gap:10px;">
         <input
           type="text"
@@ -70,11 +68,12 @@
         />
         <button class="btn" type="submit">Send</button>
       </form>
+    </form>
 
-    </section>
+  </div>
 
+</div>
   </main>
-
   <!-- FOOTER -->
   <footer>
     © 2025 PIET Alumni Connect
@@ -215,6 +214,50 @@ if (!receiverId) {
       appendMessage(message, true);
       messageInput.value = "";
     });
+
+  async function loadConversations() {
+  const users =
+    await apiCall(
+      "/api/messages/conversations"
+    );
+
+  const list =
+    document.getElementById(
+      "conversationList"
+    );
+
+  list.innerHTML = "";
+
+  users.forEach(user => {
+
+    list.innerHTML += `
+      <div
+        class="conversation-item"
+        onclick="openChat(${user.id})"
+      >
+        ${user.name}
+      </div>
+    `;
+
+  });
+}
+
+async function openChat(id) {
+
+  receiverId = id;
+
+  const profile =
+    await apiCall(
+      `/api/profile/${id}`
+    );
+
+  document.getElementById(
+    "chatTitle"
+  ).textContent =
+    profile.name;
+
+  loadMessages();
+}
 
   </script>
 

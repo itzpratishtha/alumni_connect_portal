@@ -423,6 +423,23 @@ select:focus {
   margin-left: auto;
 }
 
+.messages-layout{
+  display:flex;
+  height:70vh;
+}
+
+#conversationList{
+  width:300px;
+  border-right:1px solid #ddd;
+  overflow-y:auto;
+}
+
+.chat-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
 /* =========================
    FOOTER
 ========================= */

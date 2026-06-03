@@ -31,3 +31,35 @@ export const userExists = async (userId) => {
 
   return rows.length > 0;
 };
+
+export const getConversations = async (userId) => {
+
+  const [rows] = await pool.query(
+    `
+    SELECT DISTINCT
+      u.id,
+      u.name
+
+    FROM users u
+
+    WHERE u.id IN (
+
+      SELECT receiver_id
+      FROM messages
+      WHERE sender_id = ?
+
+      UNION
+
+      SELECT sender_id
+      FROM messages
+      WHERE receiver_id = ?
+
+    )
+
+    ORDER BY u.name
+    `,
+    [userId, userId]
+  );
+
+  return rows;
+};
