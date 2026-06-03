@@ -45,34 +45,83 @@
 
   <!-- MAIN -->
   <main class="container">
-    <div class="messages-layout">
 
-  <div id="conversationList">
+  <div class="messages-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <div id="conversationList">
+
+      <div class="conversation-search">
+        <input
+          type="text"
+          id="conversationSearch"
+          placeholder="Search conversations..."
+        >
+      </div>
+
+      <!-- Conversations injected here -->
+    </div>
+
+    <!-- RIGHT CHAT -->
+    <div class="chat-panel">
+
+      <div class="chat-header">
+
+        <div class="chat-avatar" id="chatAvatar">
+          ?
+        </div>
+
+        <div>
+          <h2 id="chatTitle">
+            Select a conversation
+          </h2>
+
+          <small id="chatStatus">
+            Click a conversation to start chatting
+          </small>
+        </div>
+
+      </div>
+
+      <div id="chatBox">
+
+        <div class="empty-chat">
+
+          <h3>
+            Welcome to Messages
+          </h3>
+
+          <p>
+            Select a conversation from the left
+            to start chatting.
+          </p>
+
+        </div>
+
+      </div>
+
+      <form id="chatForm">
+
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Type your message..."
+          required
+        >
+
+        <button type="submit" class="send-btn">
+          Send
+        </button>
+
+      </form>
+
+    </div>
+
   </div>
 
-  <div class="chat-panel">
+</main>
 
-    <h2 id="chatTitle">
-      Select a conversation
-    </h2>
 
-    <div id="chatBox"></div>
-    <form id="chatForm" style="margin-top:14px; display:flex; gap:10px;">
-  <input
-    type="text"
-    id="messageInput"
-    placeholder="Type your message..."
-    required
-  />
-  <button class="btn" type="submit">
-    Send
-  </button>
-</form>
-
-  </div>
-
-</div>
-  </main>
   <!-- FOOTER -->
   <footer>
     © 2025 PIET Alumni Connect
@@ -196,11 +245,23 @@
   class="conversation-item"
   onclick="openChat(${user.id})"
 >
-  <strong>${user.name}</strong>
-  <br>
-  <small>
-    Click to open chat
-  </small>
+
+  <div class="conversation-avatar">
+    ${user.name.charAt(0).toUpperCase()}
+  </div>
+
+  <div class="conversation-info">
+
+    <div class="conversation-name">
+      ${user.name}
+    </div>
+
+    <div class="conversation-preview">
+      Click to open chat
+    </div>
+
+  </div>
+
 </div>
 `;
   });
@@ -220,6 +281,13 @@ async function openChat(id) {
   ).textContent =
     profile.name;
 
+    document.getElementById("chatAvatar")
+  .textContent =
+  profile.name.charAt(0).toUpperCase();
+
+document.getElementById("chatStatus")
+  .textContent =
+  "Online";
   socket.emit("joinRoom", {
   senderId: Number(senderId),
   receiverId: Number(receiverId)
