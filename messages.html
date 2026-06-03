@@ -66,6 +66,9 @@
     <div class="chat-panel">
 
       <div class="chat-header">
+        <button id="backBtn">
+  ←
+</button>
 
         <div class="chat-avatar" id="chatAvatar">
           M
@@ -142,7 +145,7 @@
     const chatBox = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
     const messageInput = document.getElementById("messageInput");
-
+    
     let receiverId = null;
     let senderId;
 
@@ -157,6 +160,17 @@
     loadConversations();
 }
   init();
+
+    document
+  .getElementById("backBtn")
+  .onclick = () => {
+
+    document
+      .getElementById("conversationList")
+      .classList.remove("mobile-hide");
+
+    receiverId = null;
+};
 
     // Load previous messages
     async function loadMessages() {
@@ -286,6 +300,17 @@ document.getElementById("chatStatus")
   senderId: Number(senderId),
   receiverId: Number(receiverId)
 });
+
+if(window.innerWidth <= 768){
+
+    document
+      .getElementById("conversationList")
+      .classList.add("mobile-hide");
+
+    document
+      .querySelector(".chat-panel")
+      .style.display = "flex";
+}
   loadMessages();
 }
   </script>
