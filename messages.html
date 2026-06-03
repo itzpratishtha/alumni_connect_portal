@@ -104,6 +104,11 @@
     let senderId;
 
     async function init() {
+      chatBox.innerHTML = `
+  <div style="padding:20px;color:#666">
+    Select a conversation to start chatting
+  </div>
+`;
     const user =await apiCall("/api/auth/me");
     senderId = user.id;
     loadConversations();
