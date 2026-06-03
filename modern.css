@@ -421,7 +421,7 @@ select:focus {
   );
   color: #020617;
   margin-left: auto;
-};
+}
 
 /* ==========================
    WHATSAPP STYLE MESSAGES
@@ -668,4 +668,20 @@ footer {
 
 .user-dropdown.show {
   display: block;
+}
+
+/* FORCE CHAT LAYOUT */
+
+.messages-layout{
+    display:grid !important;
+    grid-template-columns:320px 1fr !important;
+    height:78vh !important;
+}
+
+#conversationList{
+    grid-column:1 !important;
+}
+
+.chat-panel{
+    grid-column:2 !important;
 }
