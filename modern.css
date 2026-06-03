@@ -593,6 +593,38 @@ select:focus {
 .mobile-hide{
     display:none;
 }
+#backBtn{
+    display:none;
+}
+
+@media(max-width:768px){
+
+    #backBtn{
+        display:block;
+        background:none;
+        border:none;
+        color:white;
+        font-size:24px;
+        cursor:pointer;
+        margin-right:10px;
+    }
+
+}
+@media(max-width:768px){
+
+    .chat-panel{
+        display:none;
+    }
+
+    .chat-panel.active{
+        display:flex;
+    }
+
+    .mobile-hide{
+        display:none !important;
+    }
+
+}
 
 /* =========================
    FOOTER

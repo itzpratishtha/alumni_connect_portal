@@ -163,14 +163,20 @@
 
     document
   .getElementById("backBtn")
-  .onclick = () => {
+  .addEventListener("click", () => {
 
-    document
-      .getElementById("conversationList")
-      .classList.remove("mobile-hide");
+    if(window.innerWidth <= 768){
 
-    receiverId = null;
-};
+        document
+          .getElementById("conversationList")
+          .classList.remove("mobile-hide");
+
+        document
+          .querySelector(".chat-panel")
+          .classList.remove("active");
+    }
+
+});
 
     // Load previous messages
     async function loadMessages() {
@@ -276,42 +282,36 @@ list.appendChild(searchBox);
 }
 
 async function openChat(id) {
-  chatForm.style.display = "flex";
-  receiverId = id;
 
-  const profile =
-    await apiCall(
-      `/api/profile/${id}`
-    );
+    receiverId = id;
 
-  document.getElementById(
-    "chatTitle"
-  ).textContent =
-    profile.name;
+    const profile =
+      await apiCall(`/api/profile/${id}`);
+
+    document.getElementById("chatTitle")
+      .textContent = profile.name;
 
     document.getElementById("chatAvatar")
-  .textContent =
-  profile.name.charAt(0).toUpperCase();
+      .textContent =
+      profile.name.charAt(0).toUpperCase();
 
-document.getElementById("chatStatus")
-  .textContent =
-  "Online";
-  socket.emit("joinRoom", {
-  senderId: Number(senderId),
-  receiverId: Number(receiverId)
-});
+    if(window.innerWidth <= 768){
 
-if(window.innerWidth <= 768){
+        document
+          .getElementById("conversationList")
+          .classList.add("mobile-hide");
 
-    document
-      .getElementById("conversationList")
-      .classList.add("mobile-hide");
+        document
+          .querySelector(".chat-panel")
+          .classList.add("active");
+    }
 
-    document
-      .querySelector(".chat-panel")
-      .style.display = "flex";
-}
-  loadMessages();
+    socket.emit("joinRoom", {
+        senderId:Number(senderId),
+        receiverId:Number(receiverId)
+    });
+
+    loadMessages();
 }
   </script>
 
