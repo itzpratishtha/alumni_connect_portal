@@ -65,14 +65,14 @@ export const register = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
 
-    // await saveOTP(userId, otp, expires);
-    // await sendOTPEmail(email, otp);
+    await saveOTP(userId, otp, expires);
+    await sendOTPEmail(email, otp);
 
-    await markUserVerified(userId);
+    //await markUserVerified(userId);
 
     return res.status(201).json({
       success: true,
-      message: "Registered successfully. You can login now.",
+      message: "OTP sent successfully",
     });
 
   } catch (err) {
@@ -104,19 +104,19 @@ export const login = async (req, res) => {
 
     const user = await findUserByEmail(email);
 
-    if (!user.is_verified) {
-      return res.status(403).json({
-      success: false,
-      message: "Please verify your email first"
-    });
-  }
-
     if (!user) {
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
       });
     }
+
+    if (!user.is_verified) {
+      return res.status(403).json({
+      success: false,
+      message: "Please verify your email first"
+    });
+  }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

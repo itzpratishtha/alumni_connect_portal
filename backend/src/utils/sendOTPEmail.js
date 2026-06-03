@@ -1,27 +1,34 @@
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS,
-  },
-});
+import axios from "axios";
 
 export async function sendOTPEmail(email, otp) {
-  await transporter.verify();
-  console.log("BREVO SMTP READY");
-  await transporter.sendMail({
-    from: process.env.BREVO_USER,
-    to: email,
-    subject: "Verify Your Email - PIET Alumni Connect",
-    html: `
-      <h2>Email Verification</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Expires in 10 minutes.</p>
-    `
-  });
+
+  await axios.post(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      sender: {
+        name: "PIET Alumni Connect",
+        email: "yourverifiedemail@example.com"
+      },
+
+      to: [
+        { email }
+      ],
+
+      subject: "Verify Your Email",
+
+      htmlContent: `
+        <h2>Email Verification</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>Expires in 10 minutes.</p>
+      `
+    },
+    {
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
 }
