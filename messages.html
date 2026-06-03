@@ -57,18 +57,17 @@
     </h2>
 
     <div id="chatBox"></div>
-
-    <form id="chatForm">
-      <form id="chatForm" style="margin-top:14px; display:flex; gap:10px;">
-        <input
-          type="text"
-          id="messageInput"
-          placeholder="Type your message..."
-          required
-        />
-        <button class="btn" type="submit">Send</button>
-      </form>
-    </form>
+    <form id="chatForm" style="margin-top:14px; display:flex; gap:10px;">
+  <input
+    type="text"
+    id="messageInput"
+    placeholder="Type your message..."
+    required
+  />
+  <button class="btn" type="submit">
+    Send
+  </button>
+</form>
 
   </div>
 
@@ -101,57 +100,15 @@
     const chatForm = document.getElementById("chatForm");
     const messageInput = document.getElementById("messageInput");
 
-    const params = new URLSearchParams(window.location.search);
-    const receiverId = params.get("to");
+    let receiverId = null;
     let senderId;
 
-    if (!receiverId) {
-  document.getElementById("chatTitle")
-    .textContent = "No conversation selected";
-
-  chatBox.innerHTML =
-    "<p>Select an alumni to start chatting.</p>";
-
-  chatForm.style.display = "none";
+    async function init() {
+    const user =await apiCall("/api/auth/me");
+    senderId = user.id;
+    loadConversations();
 }
-
-async function initUser() {
-
-  const user = await apiCall("/api/auth/me");
-  senderId = user.id;
-
-  const profile = await apiCall(
-    `/api/profile/${receiverId}`
-  );
-
-  document.getElementById("chatTitle")
-    .textContent =
-    `Chat with ${profile.name}`;
-
-  socket.emit("joinRoom", {
-    senderId: Number(senderId),
-    receiverId: Number(receiverId)
-  });
-
-  loadMessages();
-}
-if (!receiverId) {
-
-  document.getElementById("chatTitle")
-    .textContent = "Messages";
-
-  chatBox.innerHTML = `
-    <p>
-      Select an alumni from the Alumni page
-      to start chatting.
-    </p>
-  `;
-
-  chatForm.style.display = "none";
-
-} else {
-  initUser();
-}
+  init();
 
     if (!receiverId) {
       chatBox.innerHTML = "<p>No conversation selected.</p>";
@@ -229,21 +186,23 @@ if (!receiverId) {
   list.innerHTML = "";
 
   users.forEach(user => {
-
     list.innerHTML += `
-      <div
-        class="conversation-item"
-        onclick="openChat(${user.id})"
-      >
-        ${user.name}
-      </div>
-    `;
-
+<div
+  class="conversation-item"
+  onclick="openChat(${user.id})"
+>
+  <strong>${user.name}</strong>
+  <br>
+  <small>
+    Click to open chat
+  </small>
+</div>
+`;
   });
 }
 
 async function openChat(id) {
-
+  chatForm.style.display = "flex";
   receiverId = id;
 
   const profile =
@@ -256,9 +215,13 @@ async function openChat(id) {
   ).textContent =
     profile.name;
 
+  socket.emit("joinRoom", {
+  senderId: Number(senderId),
+  receiverId: Number(receiverId)
+});
   loadMessages();
 }
-
+init();
   </script>
 
 </body>
