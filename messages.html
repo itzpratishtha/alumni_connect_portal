@@ -174,10 +174,6 @@
         document
           .querySelector(".chat-panel")
           .classList.remove("active");
-
-          document
-  .querySelector(".messages-layout")
-  .style.display = "block";
     }
 
 });
@@ -308,10 +304,6 @@ async function openChat(id) {
         document
           .querySelector(".chat-panel")
           .classList.add("active");
-
-        document
-      .querySelector(".messages-layout")
-      .style.display = "block";
     }
 
     socket.emit("joinRoom", {

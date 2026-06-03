@@ -699,19 +699,19 @@ select:focus {
   }
 
   #conversationList{
-      width:100% !important;
-      min-width:100% !important;
-      max-width:100% !important;
+      width:100%;
+      min-width:100%;
+      max-width:100%;
       border-right:none;
   }
 
   .mobile-hide{
-    display:none !important;
+    display:none;
 }
 
   .chat-panel{
-    display: flex;
-    width:100% !important;
+    display: none;
+    width:100%;
   }
 
 }
@@ -776,18 +776,3 @@ footer {
   display: block;
 }
 
-/* FORCE CHAT LAYOUT */
-
-.messages-layout{
-    display:grid !important;
-    grid-template-columns:320px 1fr !important;
-    height:78vh !important;
-}
-
-#conversationList{
-    grid-column:1 !important;
-}
-
-.chat-panel{
-    grid-column:2 !important;
-}
