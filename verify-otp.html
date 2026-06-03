@@ -2,61 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Verify OTP</title>
+  <title>Verify OTP | PIET Alumni Connect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="/modern.css">
+  <link rel="stylesheet" href="modern.css">
 </head>
 
-<body>
+<body class="auth-page">
 
-<h2>Email Verification</h2>
+  <div class="auth-card">
 
-<input
-  type="email"
-  id="email"
-  placeholder="Email"
-/>
+    <h2>Email Verification 📧</h2>
+    <p style="text-align:center; margin-bottom:20px; color:#6b7280;">
+      Enter the OTP sent to your email address
+    </p>
 
-<input
-  type="text"
-  id="otp"
-  placeholder="OTP"
-/>
+    <input type="email" id="email" placeholder="Email address" />
+    <input type="text"  id="otp"   placeholder="Enter OTP" maxlength="6"
+           style="letter-spacing:4px; font-size:1.1rem;" />
 
-<button onclick="verifyOTP()">
-Verify
-</button>
+    <button class="btn" onclick="verifyOTP()" style="width:100%;">
+      Verify OTP
+    </button>
 
-<script src="api.js"></script>
+    <p style="text-align:center; margin-top:15px;">
+      Back to
+      <a href="login.html" style="color:#4f46e5; font-weight:500;">Login</a>
+    </p>
 
-<script>
-async function verifyOTP() {
+  </div>
 
-  const email =
-    document.getElementById("email").value;
-
-  const otp =
-    document.getElementById("otp").value;
-
-  try {
-
-    const res = await apiCall(
-      "/api/auth/verify-otp",
-      "POST",
-      { email, otp }
-    );
-
-    alert(res.message);
-
-    window.location.href = "login.html";
-
-  } catch(err) {
-    alert(err.message);
-  }
-}
-</script>
+  <script src="api.js"></script>
+  <script>
+    async function verifyOTP() {
+      const email = document.getElementById("email").value;
+      const otp   = document.getElementById("otp").value;
+      try {
+        const res = await apiCall("/api/auth/verify-otp", "POST", { email, otp });
+        alert(res.message);
+        window.location.href = "login.html";
+      } catch(err) {
+        alert(err.message);
+      }
+    }
+  </script>
 
 </body>
 </html>
