@@ -674,7 +674,7 @@ select:focus {
 @media(max-width:425px){
 
   .chat-message{
-      max-width:85%;
+      max-width:90%;
       font-size:14px;
       padding:10px 12px;
   }
@@ -705,8 +705,13 @@ select:focus {
       border-right:none;
   }
 
+  .mobile-hide{
+    display:none !important;
+}
+
   .chat-panel{
-      width:100% !important;
+    display: flex;
+    width:100% !important;
   }
 
 }
