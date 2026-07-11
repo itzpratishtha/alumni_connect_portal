@@ -29,14 +29,6 @@ export const register = async (req, res) => {
       });
     }
 
-    // OPTIONAL domain check
-    if (!isAllowedCollegeEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please use your college email",
-      });
-    }
-
     // 🔴 Check if user already exists
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
