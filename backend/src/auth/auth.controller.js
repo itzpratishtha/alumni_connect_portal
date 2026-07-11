@@ -9,17 +9,6 @@ import {
   markUserVerified,
 } from "../models/UserModel.js";
 
-// ==============================
-// OPTIONAL: College email restriction
-// ==============================
-const allowedDomains = ["poornima.org", "piet.poornima.edu.in"];
-
-function isAllowedCollegeEmail(email) {
-  if (!email || !email.includes("@")) return false;
-  const domain = email.split("@")[1].toLowerCase();
-  return allowedDomains.includes(domain);
-}
-
 // =====================================================
 // ✅ REGISTER (AUTO VERIFIED – NO OTP)
 // Endpoint: POST /api/auth/register
