@@ -151,20 +151,61 @@
     const chatForm = document.getElementById("chatForm");
     const messageInput = document.getElementById("messageInput");
     
-    let receiverId = null;
-    let senderId;
+  const urlParams = new URLSearchParams(window.location.search);
 
-    async function init() {
-      chatBox.innerHTML = `
-  <div style="padding:20px;color:#666">
-    Select a conversation to start chatting
-  </div>
-`;
-    const user =await apiCall("/api/auth/me");
+let receiverId = urlParams.get("receiverId");
+let senderId;
+
+ async function init() {
+
+  try {
+
+    const user = await apiCall("/api/auth/me");
+
     senderId = user.id;
-    loadConversations();
+
+    // Load conversation list
+    await loadConversations();
+
+    // If user came from a profile page,
+    // automatically open that person's chat
+    if (receiverId) {
+
+      receiverId = Number(receiverId);
+
+      // Prevent chatting with yourself
+      if (receiverId === Number(senderId)) {
+        alert("You cannot send messages to yourself.");
+        receiverId = null;
+        return;
+      }
+
+      await openChat(receiverId);
+
+    } else {
+
+      chatBox.innerHTML = `
+        <div style="padding:20px;color:#666">
+          Select a conversation to start chatting
+        </div>
+      `;
+    }
+
+  } catch (error) {
+
+    console.error("Messages initialization failed:", error);
+
+    chatBox.innerHTML = `
+      <div style="padding:20px;color:red">
+        Failed to load messages.
+      </div>
+    `;
+  }
 }
-  init();
+
+init();
+
+
 
     document
   .getElementById("backBtn")
@@ -220,25 +261,50 @@
     });
 
     // Send message
-    chatForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
 
-      const message = messageInput.value.trim();
-      if (!message) return;
+chatForm.addEventListener("submit", async (e) => {
 
-      // Save to DB
-      await apiCall(
-        "/api/messages",
-        "POST",
-        { receiverId, message },
-        true
-      );
-      if (chatBox.innerHTML.includes("No messages yet")) {
+  e.preventDefault();
+
+  const message = messageInput.value.trim();
+
+  if (!receiverId) {
+    alert("Please select a user before sending a message.");
+    return;
+  }
+
+  if (!message) {
+    return;
+  }
+
+  try {
+
+    await apiCall(
+      "/api/messages",
+      "POST",
+      {
+        receiverId: Number(receiverId),
+        message
+      },
+      true
+    );
+
+    if (chatBox.innerHTML.includes("No messages yet")) {
       chatBox.innerHTML = "";
-      }
-      appendMessage(message, true);
-      messageInput.value = "";
-    });
+    }
+
+    appendMessage(message, true);
+
+    messageInput.value = "";
+
+  } catch (error) {
+
+    console.error("Failed to send message:", error);
+
+    alert(error.message || "Failed to send message.");
+  }
+
+});
 
   async function loadConversations() {
   const users =

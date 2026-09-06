@@ -1,16 +1,12 @@
-// ===============================
-// 🔗 BACKEND BASE URL
-// ===============================
+//  BACKEND BASE URL
 const API_BASE = "https://alumni-connect-portal-w0fm.onrender.com";
 
-// ===============================
-// 🌐 CORE API CALL
-// ===============================
+// CORE API CALL
 async function apiCall(endpoint, method = "GET", data = null) {
   const options = {
     method,
     headers: { "Content-Type": "application/json" },
-    credentials: "include" // 🔐 cookie auto-sent
+    credentials: "include"
   };
 
   if (data) {
@@ -27,9 +23,7 @@ async function apiCall(endpoint, method = "GET", data = null) {
   return result;
 }
 
-// ===============================
-// ✅ REGISTER USER
-// ===============================
+// REGISTER USER
 async function registerUser(name, email, password, role) {
   return apiCall("/api/auth/register", "POST", {
     name,
@@ -39,28 +33,21 @@ async function registerUser(name, email, password, role) {
   });
 }
 
-// ===============================
-// ✅ LOGIN USER
-// ===============================
+// LOGIN USER
 async function loginUser(email, password) {
-  // Cookie is set by backend automatically
   return apiCall("/api/auth/login", "POST", {
     email,
     password
   });
 }
 
-// ===============================
-// ✅ LOGOUT USER
-// ===============================
+// LOGOUT USER
 async function logoutUser() {
   await apiCall("/api/auth/logout", "POST");
   window.location.href = "login.html";
 }
 
-// ===============================
-// 🧪 DEBUG (optional)
-// ===============================
+// DEBUG 
 window.API_DEBUG = {
   registerUser,
   loginUser,
