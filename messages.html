@@ -228,7 +228,7 @@ init();
     async function loadMessages() {
       chatBox.innerHTML = "<p>Loading messages...</p>";
 
-      const res = await apiCall(`/api/messages/${receiverId}`, "GET", null, true);
+      const res = await apiCall(`/api/messages/${receiverId}`, "GET", null);
       chatBox.innerHTML = "";
 
       if (!res || res.length === 0) {
@@ -285,8 +285,7 @@ chatForm.addEventListener("submit", async (e) => {
       {
         receiverId: Number(receiverId),
         message
-      },
-      true
+      }
     );
 
     if (chatBox.innerHTML.includes("No messages yet")) {
