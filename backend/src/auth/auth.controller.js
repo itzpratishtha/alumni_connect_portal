@@ -10,7 +10,7 @@ import {
 } from "../models/UserModel.js";
 
 // =====================================================
-// ✅ REGISTER (AUTO VERIFIED – NO OTP)
+//  REGISTER 
 // Endpoint: POST /api/auth/register
 // =====================================================
 export const register = async (req, res) => {
@@ -21,6 +21,7 @@ export const register = async (req, res) => {
     name = name?.trim();
     email = email?.trim().toLowerCase();
 
+
     // Validation
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -29,7 +30,15 @@ export const register = async (req, res) => {
       });
     }
 
-    // 🔴 Check if user already exists
+// College email validation
+if (!email.toLowerCase().endsWith("@poornima.org")) {
+  return res.status(400).json({
+    success: false,
+    message: "Please enter your college email ID "
+  });
+}
+
+    //  Check if user already exists
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return res.status(409).json({
@@ -113,7 +122,7 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // 🔐 STORE TOKEN IN HTTP-ONLY COOKIE
+    //  STORE TOKEN IN HTTP-ONLY COOKIE
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "none",
@@ -140,6 +149,7 @@ export const login = async (req, res) => {
     });
   }
 };
+
 
 // ==============================
 // LOGOUT
@@ -195,6 +205,7 @@ export const verifyOTP = async (req, res) => {
     });
   }
 };
+
 
 // ==============================
 // GET CURRENT USER

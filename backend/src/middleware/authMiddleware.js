@@ -10,13 +10,13 @@ export const authRequired = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🔥 FETCH FULL USER FROM DB
+    // FETCH FULL USER FROM DB
     const user = await findUserById(decoded.id);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    req.user = user; // ✅ full user object
+    req.user = user;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid token" });
@@ -34,7 +34,7 @@ export const verifyToken = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded; // ✅ important
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ success: false, message: "Invalid token" });

@@ -7,8 +7,8 @@ if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
-import http from "http";          // NEW
-import { Server } from "socket.io"; // NEW
+import http from "http";          
+import { Server } from "socket.io"; 
 
 import authRoutes from "./src/auth/auth.routes.js";
 import profileRoutes from "./src/profile/profile.routes.js";
@@ -22,10 +22,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import express from "express";
-
-console.log("BREVO_PASS RAW:", process.env.BREVO_PASS);
-console.log("BREVO_USER:", process.env.BREVO_USER);
-console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
 
 const app = express();
 

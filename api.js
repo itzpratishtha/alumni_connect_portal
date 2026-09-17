@@ -46,10 +46,3 @@ async function logoutUser() {
   await apiCall("/api/auth/logout", "POST");
   window.location.href = "login.html";
 }
-
-// DEBUG 
-window.API_DEBUG = {
-  registerUser,
-  loginUser,
-  logoutUser
-};
